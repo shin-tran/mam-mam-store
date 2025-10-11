@@ -1,0 +1,59 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: light --default;
+}
+
+@layer components {
+  label.required::before {
+    content: "*";
+    color: #dc2626;
+    margin-right: 0.25rem;
+  }
+
+  .error-log {
+    color: #dc2626;
+    padding-left: 0.5rem;
+    border-radius: 0.375rem;
+    font-size: 0.84rem;
+  }
+}
+
+@utility link {
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+.custom-toast {
+  background-color: #333;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  font-size: 15px;
+  max-width: 448px;
+  text-align: center;
+
+  opacity: 0;
+  transform: translateY(-100%);
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.custom-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.custom-toast.success {
+  background-color: #28a745;
+}
+.custom-toast.error {
+  background-color: #dc3545;
+}
+.custom-toast.info {
+  background-color: #17a2b8;
+}
+.custom-toast.warning {
+  background-color: #ffc107;
+  color: #333;
+}
