@@ -1,4 +1,4 @@
-# Snack Food Website
+# Măm Măm Store
 
 ## How to run this project
 

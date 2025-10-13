@@ -33,13 +33,13 @@ View::layout('head', ['title' => $title]);
               </label>
             </div>
             <a
-              href="/doan-phpcoban"
+              href="/"
               class="text-xl flex items-center gap-2 font-semibold"
             >
               <img
                 src="<?php echo _HOST_URL_PUBLIC ?>/icons/popcorn.svg"
                 alt="Popcorn icon"
-              >Ăn Vặt Shop</a>
+              >Măm Măm Store</a>
           </div>
 
           <!-- Navbar items -->

@@ -103,7 +103,7 @@ class AuthController {
     }
 
     $activationLink = _HOST_URL."/activate?token=$emailVerificationToken";
-    $subject = "Xác nhận email và kích hoạt tài khoản - Ăn Vặt Shop";
+    $subject = "Xác nhận email và kích hoạt tài khoản - Măm Măm Store";
     ob_start();
     require_once _PATH_URL_VIEWS.'/emails/activate-email-content.php';
     $content = ob_get_clean();
@@ -290,7 +290,7 @@ class AuthController {
       Helpers::sendJsonResponse(false, 'Có lỗi hệ thống xảy ra, xin vui lòng thử lại sau!', null, 500);
 
     $forgotPasswordLink = _HOST_URL."/reset-password?token=$forgotPasswordToken";
-    $subject = "Yêu cầu đặt lại mật khẩu - Ăn Vặt Shop";
+    $subject = "Yêu cầu đặt lại mật khẩu - Măm Măm Store";
     ob_start();
     require_once _PATH_URL_VIEWS.'/emails/forgot-pw-email-content.php';
     $content = ob_get_clean();

@@ -101,7 +101,7 @@ class Helpers {
       $mail->Port = 465;
 
       //Recipients
-      $mail->setFrom($_ENV["EMAIL_SENDER"], 'Ăn Vặt Shop');
+      $mail->setFrom($_ENV["EMAIL_SENDER"], 'Măm Măm Store');
       $mail->addAddress($emailTo);
 
       //Content

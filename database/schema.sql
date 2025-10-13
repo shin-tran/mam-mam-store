@@ -1,9 +1,9 @@
-CREATE DATABASE IF NOT EXISTS `snack_shop_dev` CHARACTER
+CREATE DATABASE IF NOT EXISTS `mam_mam_store_dev` CHARACTER
 SET
   utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- edit my.cnf: default_time_zone = +07:00 after [mysqld]
-USE snack_shop_dev;
+USE mam_mam_store_dev;
 
 CREATE TABLE
   `users` (

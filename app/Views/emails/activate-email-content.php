@@ -5,7 +5,7 @@
 >
   <header>
     <h1 style="color:#130b43;font-size:32px;font-weight:700;line-height:32px;margin:32px 0;text-align:center">
-      Chào mừng bạn đến với Ăn Vặt Shop!
+      Chào mừng bạn đến với Măm Măm Store!
     </h1>
   </header>
 

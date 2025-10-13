@@ -33,13 +33,13 @@ View::layout('head', ['title' => $title]);
               </label>
             </div>
             <a
-              href="/doan-phpcoban"
+              href="/"
               class="text-xl flex items-center gap-2 font-semibold"
             >
               <img
                 src="<?php echo _HOST_URL_PUBLIC ?>/icons/popcorn.svg"
                 alt="Popcorn icon"
-              >Ăn Vặt Shop</a>
+              >Măm Măm Store</a>
           </div>
 
           <!-- Action user -->
@@ -222,7 +222,7 @@ View::layout('head', ['title' => $title]);
               <div class="modal-box text-center">
                 <i class="fa-solid fa-circle-check text-success text-6xl mb-4"></i>
                 <h3 class="font-bold text-2xl">Đặt hàng thành công!</h3>
-                <p class="py-4">Cảm ơn bạn đã mua sắm tại Ăn Vặt Shop. Chúng tôi sẽ liên hệ với bạn để xác nhận đơn hàng
+                <p class="py-4">Cảm ơn bạn đã mua sắm tại Măm Măm Store. Chúng tôi sẽ liên hệ với bạn để xác nhận đơn hàng
                   trong thời gian sớm nhất.</p>
                 <div class="modal-action justify-center">
                   <form method="dialog">
