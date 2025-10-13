@@ -4,7 +4,7 @@
   "scripts": {
     "webpack:watch": "webpack --watch",
     "tsc:watch": "bunx tsc --watch",
-    "tailwindcss:watch": "bun run build-tailwind-all.js",
+    "tailwindcss:watch": "bunx @tailwindcss/cli -i ./resources/css/app.css -o ./public/css/app.css --watch",
     "dev": "concurrently \"bun:tailwindcss:watch\" \"bun:webpack:watch\"",
     "build": "webpack"
   },
