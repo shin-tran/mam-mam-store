@@ -1,5 +1,5 @@
 {
-    "name": "doan-phpcoban/doan-phpcoban",
+    "name": "mammam-store/mammam-store",
     "autoload": {
         "psr-4": {
             "App\\": "app/"

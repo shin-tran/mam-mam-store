@@ -13,7 +13,7 @@ class GuestMiddleware {
       if (self::isApiRequest()) {
         Helpers::sendJsonResponse(false, 'Bạn đã đăng nhập.', null, 403);
       } else {
-        header("Location: {$_ENV['BASE_PROJECT_NAME']}");
+        header("Location: /");
         exit();
       }
     }

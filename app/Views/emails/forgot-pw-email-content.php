@@ -11,7 +11,7 @@
 
   <div style="background-color:ghostwhite;border-radius:5px;padding:24px 32px">
     <p>Chào <strong><?php echo $user['full_name']; ?></strong>,</p>
-    <p>Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu cho tài khoản Ăn Vặt Shop của bạn. Vui lòng nhấn vào nút bên dưới
+    <p>Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu cho tài khoản Măm Măm Store của bạn. Vui lòng nhấn vào nút bên dưới
       để tạo một mật khẩu mới.</p>
     <div style="text-align: center; margin: 30px 0;">
       <a

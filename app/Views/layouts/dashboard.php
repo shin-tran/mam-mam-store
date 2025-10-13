@@ -30,13 +30,13 @@ View::layout('head', ['title' => $title]);
           </label>
         </div>
         <a
-          href="/doan-phpcoban"
+          href="/"
           class="text-xl flex items-center gap-2 font-semibold"
         >
           <img
             src="<?php echo _HOST_URL_PUBLIC ?>/icons/popcorn.svg"
             alt="Popcorn icon"
-          >Ăn Vặt Shop</a>
+          >Măm Măm Store</a>
       </div>
 
       <!-- Header -->
@@ -100,13 +100,13 @@ View::layout('head', ['title' => $title]);
         <!-- Sidebar content here -->
         <div class="px-2 py-3 mt-1">
           <a
-            href="/doan-phpcoban"
+            href="/"
             class="text-xl flex items-center gap-2 font-semibold"
           >
             <img
               src="<?php echo _HOST_URL_PUBLIC ?>/icons/popcorn.svg"
               alt="Popcorn icon"
-            >Ăn Vặt Shop</a>
+            >Măm Măm Store</a>
         </div>
         <li class="menu-title">Tổng quan</li>
         <li>
