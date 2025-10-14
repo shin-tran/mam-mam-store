@@ -55,11 +55,15 @@ View::layout('head', ['title' => $title]);
                   tabindex="0"
                   class="dropdown-content menu w-fit bg-base-100 rounded-box z-1 shadow-sm mt-1!"
                 >
-                  <li><a>Bánh Tuổi Thơ</a></li>
-                  <li><a>Item 2</a></li>
+                  <?php if (!empty($categories)): ?>
+                    <?php foreach ($categories as $category): ?>
+                      <li><a><?php echo htmlspecialchars($category['category_name']); ?></a></li>
+                    <?php endforeach; ?>
+                  <?php else: ?>
+                    <li><a>Không có danh mục</a></li>
+                  <?php endif; ?>
                 </ul>
               </li>
-              <li><a>Bánh Tuổi Thơ</a></li>
             </ul>
           </div>
 
@@ -67,33 +71,19 @@ View::layout('head', ['title' => $title]);
           <div>
             <?php if (Helpers::isLoggedIn()): ?>
               <!-- Cart -->
-              <div class="dropdown dropdown-end">
-                <div
-                  tabindex="0"
-                  role="button"
-                  class="btn btn-ghost btn-circle"
-                >
-                  <div class="indicator">
-                    <img
-                      src="<?php echo _HOST_URL_PUBLIC ?>/icons/shopping-cart.svg"
-                      alt="Shopping cart icon"
-                    >
-                    <span class="badge badge-sm indicator-item">8</span>
-                  </div>
-                </div>
-                <div
-                  tabindex="0"
-                  class="card card-compact dropdown-content bg-base-100 z-1 mt-3 w-52 shadow"
-                >
-                  <div class="card-body">
-                    <span class="text-lg font-bold">8 sản phẩm</span>
-                    <span class="text-info">Tổng cộng: $999</span>
-                    <div class="card-actions">
-                      <!-- TODO: Modal or direct to new page -->
-                      <a href="<?php echo _HOST_URL ?>/orders"><button class="btn btn-primary btn-block">Giỏ hàng</button></a>
+              <div class="inline-block">
+                <a href="<?php echo _HOST_URL ?>/orders">
+                  <div class="btn btn-ghost btn-circle">
+                    <div class="indicator">
+                      <img
+                        src="<?php echo _HOST_URL_PUBLIC ?>/icons/shopping-cart.svg"
+                        alt="Shopping cart icon"
+                      >
+                      <!-- TODO: Lấy số lượng sản phẩm -->
+                      <span class="badge badge-sm indicator-item">8</span>
                     </div>
                   </div>
-                </div>
+                </a>
               </div>
 
               <!-- User -->
@@ -157,13 +147,16 @@ View::layout('head', ['title' => $title]);
           class="hero min-h-[60vh] bg-base-100"
           style="background-image: url(<?php echo _HOST_URL_PUBLIC ?>/images/banner.jpg);"
         >
-          <div class="hero-overlay"></div>
+          <div class="hero-overlay bg-black/60"></div>
           <div class="hero-content text-center text-white">
             <div>
               <h1 class="text-5xl font-bold">Thế Giới Ăn Vặt Trong Tầm Tay</h1>
               <p class="py-6">Khám phá thiên đường đồ ăn vặt thơm ngon, đậm vị, đảm bảo vệ sinh. Đặt hàng ngay để nhận
                 ưu đãi hấp dẫn!</p>
-              <a class="btn">Xem Thực Đơn Ngay</a>
+              <a
+                href="#menu"
+                class="btn btn-primary"
+              >Xem Thực Đơn Ngay</a>
             </div>
           </div>
         </section>
@@ -175,7 +168,7 @@ View::layout('head', ['title' => $title]);
         >
           <div class="container mx-auto px-4">
             <div class="text-center mb-12">
-              <h2 class="text-4xl font-bold">Các Món Ăn Vặt</h2>
+              <h2 class="text-4xl font-bold">Thực Đơn Của Chúng Tôi</h2>
               <p class="text-lg mt-2 text-base-content/70">Những món ăn vặt được yêu thích nhất</p>
             </div>
 
@@ -185,18 +178,16 @@ View::layout('head', ['title' => $title]);
                   class="btn join-item filter-btn active"
                   data-category="all"
                 >Tất Cả</button>
-                <button
-                  class="btn join-item filter-btn"
-                  data-category="món khô"
-                >Món Khô</button>
-                <button
-                  class="btn join-item filter-btn"
-                  data-category="món nước"
-                >Món Nước</button>
-                <button
-                  class="btn join-item filter-btn"
-                  data-category="chiên rán"
-                >Chiên Rán</button>
+                <?php if (!empty($categories)): ?>
+                  <?php foreach ($categories as $category): ?>
+                    <button
+                      class="btn join-item filter-btn"
+                      data-category="<?php echo htmlspecialchars($category['category_name']); ?>"
+                    >
+                      <?php echo htmlspecialchars($category['category_name']); ?>
+                    </button>
+                  <?php endforeach; ?>
+                <?php endif; ?>
               </div>
               <div class="form-control">
                 <input
@@ -212,31 +203,36 @@ View::layout('head', ['title' => $title]);
               id="product-grid"
               class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8"
             >
-              <div class="card bg-base-100 shadow-xl">
-                <figure class="hover-gallery px-2 pt-2 group">
-                  <img
-                    src="https://www.vitaminhouse.vn/cdn/shop/files/chen_logo_vitaminhouse_-_2024-06-19T164242.601_300x.png?v=1744356419"
-                    alt="Bánh tráng trộn"
-                    class="rounded-t-xl h-48 w-full object-contain transition-transform duration-500 ease-in-out"
-                  />
-                  <img
-                    src="https://www.vitaminhouse.vn/cdn/shop/files/OIP_96_200x.jpg?v=1751616165"
-                    alt="Bánh tráng trộn"
-                    class="rounded-t-xl h-48 w-full object-contain opacity-0 transition-all duration-500 ease-in-out group-hover:opacity-100"
-                  />
-                </figure>
-                <div class="card-body items-center text-center p-4">
-                  <h2 class="card-title">Bánh tráng trộn</h2>
-                  <p class="font-semibold">20.000 ₫</p>
-                  <div class="card-actions">
-                    <button
-                      class="btn add-to-cart-btn"
-                      data-id="1"
-                    >Thêm vào giỏ</button>
+              <?php if (!empty($products)): ?>
+                <?php foreach ($products as $product): ?>
+                  <div
+                    class="card bg-base-100 shadow-xl product-card"
+                    data-category="<?php echo htmlspecialchars($product['category_name']); ?>"
+                    data-name="<?php echo htmlspecialchars(strtolower($product['product_name'])); ?>"
+                  >
+                    <figure class="px-2 pt-2">
+                      <img
+                        src="<?php echo htmlspecialchars($product['image_url'] ?? 'https://placehold.co/400x400?text=Măm+Măm'); ?>"
+                        alt="<?php echo htmlspecialchars($product['product_name']); ?>"
+                        class="rounded-t-xl h-48 w-full object-cover"
+                        onerror="this.onerror=null;this.src='https://placehold.co/400x400?text=Măm+Măm';"
+                      />
+                    </figure>
+                    <div class="card-body items-center text-center p-4">
+                      <h2 class="card-title"><?php echo htmlspecialchars($product['product_name']); ?></h2>
+                      <p class="font-semibold text-primary"><?php echo number_format($product['price'], 0, ',', '.'); ?> ₫</p>
+                      <div class="card-actions">
+                        <button
+                          class="btn btn-primary add-to-cart-btn"
+                          data-id="<?php echo $product['id']; ?>"
+                        >Thêm vào giỏ</button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                </nav>
-              </div>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <p class="text-center col-span-full">Chưa có sản phẩm nào để hiển thị.</p>
+              <?php endif; ?>
             </div>
           </div>
         </section>
@@ -258,13 +254,16 @@ View::layout('head', ['title' => $title]);
               Danh Mục Sản Phẩm
             </summary>
             <ul class="bg-base-100 [&_li>*]:rounded-none p-0 shadow">
-              <li><a>Bánh Mặn</a></li>
-              <li><a>Bánh Ngọt</a></li>
-              <li><a>Kẹo các loại</a></li>
+              <?php if (!empty($categories)): ?>
+                <?php foreach ($categories as $category): ?>
+                  <li><a><?php echo htmlspecialchars($category['category_name']); ?></a></li>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <li><a>Không có danh mục</a></li>
+              <?php endif; ?>
             </ul>
           </details>
         </li>
-        <li><a>Sidebar Item 2</a></li>
 
         <!-- Login / Register -->
         <?php if (!Helpers::isLoggedIn()): ?>
