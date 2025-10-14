@@ -1,4 +1,4 @@
-import { authService } from "../services/auth-service";
+import { authService } from "../services/auth-service.js";
 
 const logoutBtn = document.getElementById("btn-logout");
 

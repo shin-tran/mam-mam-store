@@ -1,1 +1,29 @@
-function a3_0x568d(_0x2f5697,_0x4defd0){var _0x4d3d70=a3_0x4d3d();return a3_0x568d=function(_0x568dfc,_0x5387cf){_0x568dfc=_0x568dfc-0xc3;var _0x5605cf=_0x4d3d70[_0x568dfc];return _0x5605cf;},a3_0x568d(_0x2f5697,_0x4defd0);}function a3_0x4d3d(){var _0xd5cf7b=['16371LRLNtg','prototype','1266842JXgnmn','2HJCLoR','3412041USdhzo','call','10170088xjZVFm','146796CQtWEa','2678274ZxUXde','11710EPhEWj','exports','7AcfMYg','2617650ZwgEXh'];a3_0x4d3d=function(){return _0xd5cf7b;};return a3_0x4d3d();}(function(_0x20fa07,_0x14e4a3){var _0x544613=a3_0x568d,_0x2f2ac5=_0x20fa07();while(!![]){try{var _0x167884=parseInt(_0x544613(0xca))/0x1*(-parseInt(_0x544613(0xcb))/0x2)+parseInt(_0x544613(0xcc))/0x3+parseInt(_0x544613(0xcf))/0x4+-parseInt(_0x544613(0xc7))/0x5+-parseInt(_0x544613(0xc3))/0x6*(-parseInt(_0x544613(0xc6))/0x7)+-parseInt(_0x544613(0xce))/0x8+parseInt(_0x544613(0xc8))/0x9*(parseInt(_0x544613(0xc4))/0xa);if(_0x167884===_0x14e4a3)break;else _0x2f2ac5['push'](_0x2f2ac5['shift']());}catch(_0x2f2b8f){_0x2f2ac5['push'](_0x2f2ac5['shift']());}}}(a3_0x4d3d,0xa82c9),((()=>{'use strict';var _0x514638=a3_0x568d;var _0x51b80d={0x1ae:(_0x2bb72f,_0x15f846,_0x51a8e4)=>{}},_0x54d508={};function _0x1c048e(_0x32d767){var _0x326697=a3_0x568d,_0x320908=_0x54d508[_0x32d767];if(void 0x0!==_0x320908)return _0x320908['exports'];var _0x220468=_0x54d508[_0x32d767]={'exports':{}};return _0x51b80d[_0x32d767](_0x220468,_0x220468[_0x326697(0xc5)],_0x1c048e),_0x220468['exports'];}_0x1c048e['d']=(_0x153029,_0x29d1c6)=>{for(var _0x2837fe in _0x29d1c6)_0x1c048e['o'](_0x29d1c6,_0x2837fe)&&!_0x1c048e['o'](_0x153029,_0x2837fe)&&Object['defineProperty'](_0x153029,_0x2837fe,{'enumerable':!0x0,'get':_0x29d1c6[_0x2837fe]});},_0x1c048e['o']=(_0x13df73,_0x5783a9)=>Object[_0x514638(0xc9)]['hasOwnProperty'][_0x514638(0xcd)](_0x13df73,_0x5783a9),_0x1c048e(0x1ae);})()));
+import { FULL_URL } from "../app";
+export class Helpers {
+    static validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+    static isPhone(phone) {
+        let cleaned = phone.replace(/[^0-9+]/g, "");
+        if (cleaned.startsWith("+84"))
+            cleaned = "0" + cleaned.slice(3);
+        const regex = /^(0)(3[2-9]|5[689]|7[06-9]|8[1-689]|9[0-46-9])[0-9]{7}$/;
+        return regex.test(cleaned);
+    }
+    static displayError(fieldName, message) {
+        const errorElement = document.querySelector(`.error-log[data-field="${fieldName}"]`);
+        if (errorElement) {
+            message === ""
+                ? errorElement.classList.add("hidden")
+                : errorElement.classList.remove("hidden");
+            errorElement.textContent = message;
+        }
+    }
+    static clearError(fieldName) {
+        this.displayError(fieldName, "");
+    }
+    static redirect(path = "") {
+        window.location.href = `${FULL_URL}${path}`;
+    }
+}

@@ -1,8 +1,8 @@
-import { FULL_URL } from "../../app";
-import { spinnerIcon } from "../../utils/constants";
-import { authService } from "../../services/auth-service";
-import { toastManager } from "../../toast-manager";
-import { Helpers } from "../../utils/helpers";
+import { FULL_URL } from "../../app.js";
+import { spinnerIcon } from "../../utils/constants.js";
+import { authService } from "../../services/auth-service.js";
+import { toastManager } from "../../toast-manager.js";
+import { Helpers } from "../../utils/helpers.js";
 
 const resetPasswordForm = document.getElementById(
   "reset-password-form"

@@ -1,4 +1,4 @@
 {
-  // "typescript.preferences.importModuleSpecifierEnding": "js",
+  "typescript.preferences.importModuleSpecifierEnding": "js",
   "css.lint.unknownAtRules": "ignore"
 }
