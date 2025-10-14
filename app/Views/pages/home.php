@@ -55,11 +55,10 @@ View::layout('head', ['title' => $title]);
                   tabindex="0"
                   class="dropdown-content menu w-fit bg-base-100 rounded-box z-1 shadow-sm mt-1!"
                 >
-                  <li><a>Item 1</a></li>
+                  <li><a>Bánh Tuổi Thơ</a></li>
                   <li><a>Item 2</a></li>
                 </ul>
               </li>
-              <li><a>Bánh Trung Thu 2025</a></li>
               <li><a>Bánh Tuổi Thơ</a></li>
             </ul>
           </div>

@@ -8,6 +8,7 @@ class PermissionMiddleware {
     $userPermissions = $userData->data->permissions ?? [];
     $userRoles = $userData->data->roles ?? [];
 
+    // admin truy cập mọi chức năng
     if (in_array('Super Admin', $userRoles))
       return;
 

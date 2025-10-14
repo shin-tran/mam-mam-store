@@ -1,4 +1,4 @@
-import { FULL_URL } from "../app.js";
+import { AppConfig } from "../app.js";
 import type { ApiResponse, LoginResponse } from "../type.js";
 import { Helpers } from "../utils/helpers.js";
 
@@ -15,7 +15,7 @@ class AuthService {
   async checkEmailExists(email: string) {
     const formData = new FormData();
     formData.append("email", email);
-    const url = `${FULL_URL}/api/check-email`;
+    const url = `${AppConfig.BASE_URL}/api/check-email`;
     try {
       const result: ApiResponse<{ exists: boolean }> = await fetch(url, {
         method: "post",
@@ -31,7 +31,7 @@ class AuthService {
   async checkPhoneNumberExists(phoneNumber: string) {
     const formData = new FormData();
     formData.append("phone_number", phoneNumber);
-    const url = `${FULL_URL}/api/check-phone-number`;
+    const url = `${AppConfig.BASE_URL}/api/check-phone-number`;
     try {
       const result: ApiResponse<{ exists: boolean }> = await fetch(url, {
         method: "post",
@@ -49,7 +49,7 @@ class AuthService {
   }
 
   async register(formData: FormData) {
-    const url = `${FULL_URL}/api/register`;
+    const url = `${AppConfig.BASE_URL}/api/register`;
 
     const result: ApiResponse<null> = await fetch(url, {
       method: "post",
@@ -60,7 +60,7 @@ class AuthService {
   }
 
   async activateAccount(formData: FormData) {
-    const url = `${FULL_URL}/api/activate`;
+    const url = `${AppConfig.BASE_URL}/api/activate`;
 
     const result: ApiResponse<null> = await fetch(url, {
       method: "post",
@@ -71,7 +71,7 @@ class AuthService {
   }
 
   async login(formData: FormData) {
-    const url = `${FULL_URL}/api/login`;
+    const url = `${AppConfig.BASE_URL}/api/login`;
 
     const result: ApiResponse<LoginResponse> = await fetch(url, {
       method: "post",
@@ -87,7 +87,7 @@ class AuthService {
   }
 
   async forgotPassword(formData: FormData) {
-    const url = `${FULL_URL}/api/forgot-password`;
+    const url = `${AppConfig.BASE_URL}/api/forgot-password`;
 
     const result: ApiResponse<null> = await fetch(url, {
       method: "post",
@@ -98,7 +98,7 @@ class AuthService {
   }
 
   async resetPassword(formData: FormData) {
-    const url = `${FULL_URL}/api/reset-password`;
+    const url = `${AppConfig.BASE_URL}/api/reset-password`;
 
     const result: ApiResponse<null> = await fetch(url, {
       method: "post",
@@ -117,7 +117,7 @@ class AuthService {
     localStorage.removeItem("token_expires_at");
 
     try {
-      const url = `${FULL_URL}/api/logout`;
+      const url = `${AppConfig.BASE_URL}/api/logout`;
       await fetch(url, {
         method: "post",
         headers: {
@@ -164,7 +164,7 @@ class AuthService {
 
   private async refreshToken(): Promise<string> {
     if (!this.refreshTokenPromise) {
-      const url = `${FULL_URL}/api/refresh-token`;
+      const url = `${AppConfig.BASE_URL}/api/refresh-token`;
       this.refreshTokenPromise = fetch(url, { method: "POST" })
         .then(async (res) => {
           if (!res.ok)

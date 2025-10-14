@@ -1,4 +1,4 @@
-import { FULL_URL } from "../app";
+import { AppConfig } from "../app.js";
 export class Helpers {
     static validateEmail(email) {
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -24,6 +24,6 @@ export class Helpers {
         this.displayError(fieldName, "");
     }
     static redirect(path = "") {
-        window.location.href = `${FULL_URL}${path}`;
+        window.location.href = `${AppConfig.BASE_URL}${path}`;
     }
 }

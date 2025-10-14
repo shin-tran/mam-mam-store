@@ -2,7 +2,10 @@
 namespace App\Core;
 
 class View {
+  // require các file trong view và thêm layout nếu có
   public static function render(string $view, array $data = [], ?string $layout = null) {
+    // chuyển đổi các key-value pairs của một mảng
+    // thành các biến độc lập.
     extract($data);
 
     $viewFile = _PATH_URL_VIEWS."/{$view}.php";
@@ -12,6 +15,7 @@ class View {
       return;
     }
 
+    // ghi vào bộ nhớ đệm và gán vào $content
     ob_start();
     require_once $viewFile;
     $content = ob_get_clean();
@@ -28,6 +32,7 @@ class View {
     }
   }
 
+  // helper require các file trong layouts
   public static function layout($layoutName, $data = []) {
     $name = _PATH_URL_VIEWS."/layouts/{$layoutName}.php";
     if (file_exists($name)) {
