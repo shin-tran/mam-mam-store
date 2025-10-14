@@ -2,7 +2,6 @@
 namespace App\Controllers;
 
 use App\Core\View;
-use App\Helpers\Helpers;
 
 class PageController {
   public function home() {

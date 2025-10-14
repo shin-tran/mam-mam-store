@@ -13,6 +13,17 @@ class Router {
   ];
 
   protected function add($method, $uri, $controller, $action, $middlewares = []) {
+    /**
+     * [
+     *  '$method' => [
+     *   '$uri' => [
+     *      'controller' => $controller,
+     *      'method' => $action,
+     *      'middlewares' => [ '', '',... ]
+     *     ]
+     *   ]
+     * ]
+     */
     $this->routes[$method][$uri] = [
       'controller' => $controller,
       'method' => $action,
@@ -24,11 +35,14 @@ class Router {
     $this->add('GET', $uri, $controller, $action, $middlewares);
   }
 
+
   public function post($uri, $controller, $action, $middlewares = []) {
     $this->add('POST', $uri, $controller, $action, $middlewares);
   }
 
   public function dispatch($uri, $method) {
+    // kiểm tra có method và uri hay không
+    // nếu không thì hiển thị 404 (không tồn tại)
     if (isset($this->routes[$method]) && array_key_exists($uri, $this->routes[$method])) {
       $route = $this->routes[$method][$uri];
 

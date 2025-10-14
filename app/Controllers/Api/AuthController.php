@@ -179,7 +179,7 @@ class AuthController {
       [
         'expires' => $refreshTokenExpiresAt->getTimestamp(),
         'path' => '/',
-        'secure' => true,
+        // 'secure' => true, //NOTE: Uncomment if the website have https
         'httponly' => true,
         'samesite' => 'Strict'
       ]
@@ -402,7 +402,7 @@ class AuthController {
       [
         'expires' => time() - 3600, // Hết hạn 1 giờ trước
         'path' => '/',
-        'secure' => true,
+        // 'secure' => true, //NOTE: Uncomment if the website have https
         'httponly' => true,
         'samesite' => 'Strict'
       ]

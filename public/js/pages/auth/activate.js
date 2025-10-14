@@ -1,4 +1,4 @@
-import { FULL_URL } from "../../app.js";
+import { AppConfig } from "../../app.js";
 import { authService } from "../../services/auth-service.js";
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
@@ -12,7 +12,7 @@ try {
         if (result.success) {
             const anchorEle = document.createElement("a");
             const btnLogin = document.createElement("button");
-            anchorEle.href = `${FULL_URL}/login`;
+            anchorEle.href = `${AppConfig.BASE_URL}/login`;
             btnLogin.type = "button";
             btnLogin.classList.add("btn", "w-full");
             btnLogin.textContent = "Đến trang đăng nhập";

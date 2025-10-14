@@ -1,4 +1,4 @@
-import { FULL_URL } from "../app";
+import { AppConfig } from "../app";
 
 export class Helpers {
   static validateEmail(email: string): boolean {
@@ -30,6 +30,6 @@ export class Helpers {
   }
 
   static redirect(path: string = "") {
-    window.location.href = `${FULL_URL}${path}`;
+    window.location.href = `${AppConfig.BASE_URL}${path}`;
   }
 }
