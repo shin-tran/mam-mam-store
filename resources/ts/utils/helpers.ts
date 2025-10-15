@@ -1,4 +1,4 @@
-import { AppConfig } from "../app";
+import { AppConfig } from "../app.js";
 
 export class Helpers {
   static validateEmail(email: string): boolean {

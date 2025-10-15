@@ -24,7 +24,7 @@ class AuthMiddleware {
   }
 
   private static function handleApiAuth() {
-    $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? null;
+    $authHeader = $_SERVER['REDIRECT_REDIRECT_HTTP_AUTHORIZATION'] ?? null;
     // kiểm tra có access token hay không
     if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
       Helpers::sendJsonResponse(false, 'Yêu cầu thiếu hoặc sai định dạng token.', null, 401);

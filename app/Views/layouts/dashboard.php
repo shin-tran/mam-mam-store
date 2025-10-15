@@ -15,33 +15,22 @@ View::layout('head', ['title' => $title]);
     />
 
     <div class="drawer-content flex flex-col">
-      <!-- Menu bar on mobile -->
-      <div class="w-full navbar bg-base-100 shadow-sm lg:hidden">
-        <div class="lg:hidden">
-          <label
-            for="mobile-drawer"
-            aria-label="open sidebar"
-            class="btn btn-square btn-ghost"
-          >
-            <img
-              src="<?php echo _HOST_URL_PUBLIC ?>/icons/menu.svg"
-              alt="Mobile menu icon"
-            >
-          </label>
-        </div>
-        <a
-          href="/"
-          class="text-xl flex items-center gap-2 font-semibold"
-        >
-          <img
-            src="<?php echo _HOST_URL_PUBLIC ?>/icons/popcorn.svg"
-            alt="Popcorn icon"
-          >Măm Măm Store</a>
-      </div>
-
       <!-- Header -->
       <div class="shadow-sm bg-base-100 z-10 sticky top-0">
-        <header class="navbar mx-auto justify-end">
+        <header class="navbar mx-auto justify-between lg:justify-end">
+          <!-- Menu bar on mobile -->
+          <div class="lg:hidden">
+            <label
+              for="mobile-drawer"
+              aria-label="open sidebar"
+              class="btn btn-square btn-ghost"
+            >
+              <img
+                src="<?php echo _HOST_URL_PUBLIC ?>/icons/menu.svg"
+                alt="Mobile menu icon"
+              >
+            </label>
+          </div>
           <div>
             <!-- User -->
             <h3 class="inline-block">Xin chào Admin!</h3>

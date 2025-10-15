@@ -91,23 +91,10 @@ class User {
     return $this->db->getAll($sql);
   }
 
-  public function getPermissions() {
-    $sql = "SELECT * FROM `permissions`";
-    return $this->db->getAll($sql);
-  }
-
   public function getRolesUser(int $userId) {
     $sql = "SELECT `name` FROM `role_user`
             INNER JOIN `roles` ON `role_user`.`role_id` = `roles`.`id`
             WHERE `user_id` = :user_id";
-    return $this->db->getAll($sql, ['user_id' => $userId]);
-  }
-
-  public function getPermissionsUser(int $userId) {
-    $sql = "SELECT `permissions`.`name` FROM `permission_role`
-            INNER JOIN `permissions` ON `permission_role`.`permission_id` = `permissions`.`id`
-            INNER JOIN `role_user` ON `permission_role`.`role_id` = `role_user`.`role_id`
-            WHERE `role_user`.`user_id` = :user_id";
     return $this->db->getAll($sql, ['user_id' => $userId]);
   }
 

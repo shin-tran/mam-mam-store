@@ -5,6 +5,7 @@ import { toastManager } from "../toast-manager.js";
 const logoutBtn = document.getElementById("btn-logout");
 logoutBtn?.addEventListener("click", async () => {
   await authService.logout();
+  localStorage.removeItem("cart");
 });
 
 // === Xử lý lọc và tìm kiếm sản phẩm ===

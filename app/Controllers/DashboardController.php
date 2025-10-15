@@ -2,8 +2,18 @@
 namespace App\Controllers;
 
 use App\Core\View;
+use App\Helpers\Helpers;
+use App\Models\Category;
+use App\Models\Product;
 
 class DashboardController {
+  public function __construct() {
+    // Kiểm tra vai trò của người dùng ngay khi controller được khởi tạo.
+    // Nếu là 'customer', họ sẽ không có quyền truy cập và bị chuyển hướng.
+    if (Helpers::userHasRole('customer')) {
+      Helpers::redirect('/');
+    }
+  }
   public function index() {
     View::render('pages/dashboard/index', [
       'title' => 'Dashboard'
@@ -17,8 +27,16 @@ class DashboardController {
   }
 
   public function products() {
+    $productModel = new Product();
+    $categoryModel = new Category();
+    // lấy các thông tin và sẽ được sử dụng trong pages/dashboard/products
+    $products = $productModel->getAllProducts();
+    $categories = $categoryModel->getAll();
+
     View::render('pages/dashboard/products', [
-      'title' => 'Sản phẩm'
+      'title' => 'Sản phẩm',
+      'products' => $products,
+      'categories' => $categories,
     ], 'layouts/dashboard');
   }
 

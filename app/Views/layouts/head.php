@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <!--end::Accessibility Meta Tags-->
   <!--begin::Primary Meta Tags-->
+  <link rel="icon" type="image/x-icon" href="<?php echo _HOST_URL_PUBLIC ?>/favicon.ico" />
   <meta name="title" content="<?php echo $title ? "{$title} | Măm Măm Store" : "Măm Măm Store" ?>" />
   <!--end::Primary Meta Tags-->
   <link rel="preload" href="<?php echo _HOST_URL_PUBLIC ?>/css/app.css" as="style" />
