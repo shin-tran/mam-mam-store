@@ -147,4 +147,20 @@ class Helpers {
   public static function isLoggedIn() {
     return isset($_COOKIE['refresh_token']);
   }
+
+  public static function getCurrentUser() {
+    return $_SESSION['user'] ?? null;
+  }
+
+  public static function userHasRole($role) {
+    $user = self::getCurrentUser();
+    if (!$user || !isset($user['roles'])) {
+      return false;
+    }
+    if (is_array($role)) {
+      // Check if user has any of the roles in the array
+      return !empty(array_intersect($role, $user['roles']));
+    }
+    return in_array($role, $user['roles']);
+  }
 }

@@ -19,8 +19,8 @@
         <td>Blue</td>
         <td>Cy Ganderton</td>
         <td>
-          <button class="btn">Sửa</button>
-          <button class="btn">Xoá</button>
+          <button class="btn btn-ghost">Sửa</button>
+          <button class="btn btn-ghost text-error">Xóa</button>
         </td>
       </tr>
 

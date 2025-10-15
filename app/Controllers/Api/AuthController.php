@@ -189,7 +189,14 @@ class AuthController {
     $issuedAt = new DateTimeImmutable();
     $expire = $issuedAt->modify("+{$_ENV['ACCESS_TOKEN_LIFETIME']}")->getTimestamp();
     $roles = array_column($userModel->getRolesUser($user['id']), 'name');
-    $permissions = array_column($userModel->getPermissionsUser($user['id']), 'name');
+
+    // Lưu thông tin người dùng vào Session
+    $_SESSION['user'] = [
+      'id' => $user['id'],
+      'full_name' => $user['full_name'],
+      'email' => $user['email'],
+      'roles' => $roles,
+    ];
 
     $payload = [
       'iat' => $issuedAt->getTimestamp(),     // Issued At
@@ -197,7 +204,6 @@ class AuthController {
       'data' => [
         'userId' => $user['id'],
         'roles' => $roles,
-        'permissions' => $permissions
       ]
     ];
 
@@ -231,6 +237,10 @@ class AuthController {
     }
 
     self::clearRefreshTokenCookie();
+
+    // Xóa dữ liệu session
+    session_unset();
+    session_destroy();
 
     Helpers::sendJsonResponse(true, 'Đăng xuất thành công.');
   }
@@ -374,7 +384,14 @@ class AuthController {
     $expire = $issuedAt->modify("+{$_ENV['ACCESS_TOKEN_LIFETIME']}")->getTimestamp();
 
     $roles = array_column($userModel->getRolesUser($user['id']), 'name');
-    $permissions = array_column($userModel->getPermissionsUser($user['id']), 'name');
+
+    // Cập nhật lại session
+    $_SESSION['user'] = [
+      'id' => $user['id'],
+      'full_name' => $user['full_name'],
+      'email' => $user['email'],
+      'roles' => $roles,
+    ];
 
     $payload = [
       'iat' => $issuedAt->getTimestamp(),
@@ -382,7 +399,6 @@ class AuthController {
       'data' => [
         'userId' => $user['id'],
         'roles' => $roles,
-        'permissions' => $permissions
       ]
     ];
     $accessToken = JWT::encode($payload, $secretKey, 'HS256');

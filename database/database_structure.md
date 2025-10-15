@@ -23,7 +23,7 @@ Classifies the snack products. "Bim Bim", "Bánh Gạo", "Kẹo", "Đồ uống"
 | ------------- | ------------ | ------ |
 | id            | INT, PK, AI  |        |
 | category_name | VARCHAR(255) | Unique |
-| image_url     | VARCHAR(255) |        |
+| image_path    | VARCHAR(255) |        |
 
 ## 3. Table `products`
 
@@ -35,7 +35,7 @@ Stores snack food info.
 | product_name   | VARCHAR(255)  |      |
 | description    | TEXT          |      |
 | price          | DECIMAL(10,2) |      |
-| image_url      | VARCHAR(255)  |      |
+| image_path     | VARCHAR(255)  |      |
 | stock_quantity | INT           |      |
 | created_at     | TIMESTAMP     |      |
 | updated_at     | TIMESTAMP     |      |

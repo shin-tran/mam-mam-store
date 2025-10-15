@@ -49,14 +49,6 @@ CREATE TABLE
   );
 
 CREATE TABLE
-  `permissions` (
-    `id` INT PRIMARY KEY AUTO_INCREMENT,
-    `name` VARCHAR(100) NOT NULL,
-    `description` TEXT,
-    UNIQUE KEY `uq_name` (`name`)
-  );
-
-CREATE TABLE
   `role_user` (
     `user_id` INT NOT NULL,
     `role_id` INT NOT NULL,
@@ -66,19 +58,10 @@ CREATE TABLE
   );
 
 CREATE TABLE
-  `permission_role` (
-    `permission_id` INT NOT NULL,
-    `role_id` INT NOT NULL,
-    PRIMARY KEY (`permission_id`, `role_id`),
-    FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`) ON DELETE CASCADE,
-    FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE
-  );
-
-CREATE TABLE
   `categories` (
     `id` INT PRIMARY KEY AUTO_INCREMENT,
     `category_name` VARCHAR(255) NOT NULL,
-    `image_url` VARCHAR(255),
+    `image_path` VARCHAR(255),
     UNIQUE KEY `uq_category_name` (`category_name`)
   );
 
@@ -86,24 +69,15 @@ CREATE TABLE
   `products` (
     `id` INT PRIMARY KEY AUTO_INCREMENT,
     `product_name` VARCHAR(255) NOT NULL,
-    `description` TEXT,
     `price` DECIMAL(10, 2) NOT NULL,
     `stock_quantity` INT NOT NULL DEFAULT 0,
     `category_id` INT,
+    `description` TEXT,
+    `image_path` VARCHAR(255) NOT NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL,
     INDEX `idx_product_name` (`product_name`)
-  );
-
-CREATE TABLE
-  `product_images` (
-    `id` INT PRIMARY KEY AUTO_INCREMENT,
-    `product_id` INT NOT NULL,
-    `image_url` VARCHAR(255) NOT NULL,
-    `display_order` TINYINT NOT NULL DEFAULT 0,
-    `alt_text` VARCHAR(255),
-    FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
   );
 
 CREATE TABLE

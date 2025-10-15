@@ -10,7 +10,7 @@ class ToastManager {
     if (findToast === null) {
       const body = document.body;
       this.toastContainer = document.createElement("div");
-      this.toastContainer.className = "toast toast-top toast-center";
+      this.toastContainer.className = "toast toast-top toast-center z-1000";
       body.prepend(this.toastContainer);
     } else this.toastContainer = findToast;
   }
