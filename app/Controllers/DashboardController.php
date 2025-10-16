@@ -44,11 +44,13 @@ class DashboardController {
   public function users() {
     $userModel = new User();
 
-    $users = $userModel->getAllUsersWithRoles();
+    $users = $userModel->getAllUsersWithRole();
+    $allRoles = $userModel->getRoles();
 
     View::render('pages/dashboard/users', [
       'title' => 'Khách hàng',
-      'users' => $users
+      'users' => $users,
+      'allRoles' => $allRoles
     ], 'layouts/dashboard');
   }
 }

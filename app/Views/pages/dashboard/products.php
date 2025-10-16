@@ -72,7 +72,7 @@
       id="add-product-form"
       novalidate
     >
-      <div class="flex flex-col gap-4 [&>div]:w-full ">
+      <div class="flex flex-col gap-4 [&>div]:w-full">
         <div class="form-control flex justify-between">
           <label class="label"><span class="label-text required">Tên sản phẩm</span></label>
           <input

@@ -15,7 +15,7 @@ class User {
 
   // IDEA: thêm construct có tham số là email user hoặc id
 
-  public function getAllUsersWithRoles() {
+  public function getAllUsersWithRole() {
     $sql = "SELECT
               u.id,
               u.full_name,
@@ -23,13 +23,47 @@ class User {
               u.phone_number,
               u.address,
               u.is_activated,
-              GROUP_CONCAT(r.name SEPARATOR ', ') as roles
-            FROM users u
-            LEFT JOIN role_user ru ON u.id = ru.user_id
-            LEFT JOIN roles r ON ru.role_id = r.id
+              r.name as `role`
+            FROM `users` u
+            LEFT JOIN `role_user` ru ON u.id = ru.user_id
+            LEFT JOIN `roles` r ON ru.role_id = r.id
             GROUP BY u.id
             ORDER BY u.created_at DESC";
     return $this->db->getAll($sql);
+  }
+
+  public function updateUserDetailsAndRole(int $userId, array $details, int $roleId) {
+    $this->db->beginTransaction();
+    try {
+      // 1. Cập nhật thông tin chi tiết người dùng
+      $allowedFields = ['full_name', 'phone_number', 'address'];
+      $updateData = [];
+      foreach ($allowedFields as $field) {
+        if (isset($details[$field])) {
+          // Gán giá trị null nếu chuỗi rỗng
+          $updateData[$field] = $details[$field] !== '' ? $details[$field] : null;
+        }
+      }
+      if (!empty($updateData)) {
+        $this->db->update('users', $updateData, 'id = :id', ['id' => $userId]);
+      }
+
+      // Xóa các vai trò cũ
+      $this->db->delete('role_user', 'user_id = ?', [$userId]);
+
+      // Thêm các vai trò mới
+      if (!empty($roleId)) {
+        $this->db->insert('role_user', ['user_id' => $userId, 'role_id' => $roleId]);
+      }
+
+      $this->db->commit();
+      return true;
+
+    } catch (PDOException $ex) {
+      $this->db->rollBack();
+      $this->db->writeErrorLog($ex);
+      return false;
+    }
   }
 
   public function deleteUser(int $userId) {
@@ -112,7 +146,7 @@ class User {
     return $this->db->getAll($sql);
   }
 
-  public function getRolesUser(int $userId) {
+  public function getRoleUser(int $userId) {
     $sql = "SELECT `name` FROM `role_user`
             INNER JOIN `roles` ON `role_user`.`role_id` = `roles`.`id`
             WHERE `user_id` = :user_id";
