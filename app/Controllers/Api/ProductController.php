@@ -20,13 +20,11 @@ class ProductController {
 
     // Validate file types
     $allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
-    foreach ($_FILES['images']['type'] as $type) {
-      if (!in_array($type, $allowedTypes)) {
-        Helpers::sendJsonResponse(false, 'Chỉ chấp nhận file ảnh (JPEG, PNG, WEBP).', null, 422);
-      }
+    if (!in_array($_FILES['image']['type'], $allowedTypes)) {
+      Helpers::sendJsonResponse(false, 'Chỉ chấp nhận file ảnh (JPEG, PNG, WEBP).', null, 422);
     }
 
-    $imagePath = $this->handleFileUpload($_FILES['images']);
+    $imagePath = $this->handleFileUpload($_FILES['image']);
     if ($imagePath === false) {
       Helpers::sendJsonResponse(false, 'Tải lên hình ảnh thất bại.', null, 500);
     }
