@@ -79,8 +79,7 @@ View::layout('head', ['title' => $title]);
                         src="<?php echo _HOST_URL_PUBLIC ?>/icons/shopping-cart.svg"
                         alt="Shopping cart icon"
                       >
-                      <!-- TODO: Lấy số lượng sản phẩm -->
-                      <span class="badge badge-sm indicator-item">8</span>
+                      <span class="badge badge-sm indicator-item">0</span>
                     </div>
                   </div>
                 </a>
@@ -96,7 +95,10 @@ View::layout('head', ['title' => $title]);
                   <div class="w-10 rounded-full">
                     <img
                       alt="User avatar"
-                      src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                      src="https://placehold.co/40x40?text=<?php
+                      $split = explode(" ", $_SESSION['user']['full_name']);
+                      echo $split[count($split) - 1];
+                      ?>"
                     />
                   </div>
                 </div>
@@ -120,7 +122,6 @@ View::layout('head', ['title' => $title]);
                       </a>
                     </li>
                   <?php endif; ?>
-                  <li><a>Cài đặt</a></li>
                   <li id="btn-logout"><a>Đăng xuất</a></li>
                 </ul>
               </div>

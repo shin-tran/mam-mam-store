@@ -5,6 +5,7 @@ use App\Core\View;
 use App\Helpers\Helpers;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\User;
 
 class DashboardController {
   public function __construct() {
@@ -41,8 +42,13 @@ class DashboardController {
   }
 
   public function users() {
+    $userModel = new User();
+
+    $users = $userModel->getAllUsersWithRoles();
+
     View::render('pages/dashboard/users', [
-      'title' => 'Khách hàng'
+      'title' => 'Khách hàng',
+      'users' => $users
     ], 'layouts/dashboard');
   }
 }

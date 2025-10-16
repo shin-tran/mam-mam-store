@@ -33,17 +33,21 @@ View::layout('head', ['title' => $title]);
           </div>
           <div>
             <!-- User -->
-            <h3 class="inline-block">Xin chào Admin!</h3>
+            <h3 class="inline-block">Xin chào <?php echo $_SESSION['user']['full_name'] ?>!</h3>
             <div class="dropdown dropdown-end">
               <div
                 tabindex="0"
                 role="button"
                 class="btn btn-ghost btn-circle avatar"
               >
-                <div class="w-10 rounded-full">
+                <div class="avatar w-10">
                   <img
                     alt="User avatar"
-                    src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                    src="https://placehold.co/40x40?text=<?php
+                    $split = explode(" ", $_SESSION['user']['full_name']);
+                    echo $split[count($split) - 1];
+                    ?>"
+                    class="rounded-full"
                   />
                 </div>
               </div>
@@ -64,7 +68,6 @@ View::layout('head', ['title' => $title]);
                     Dashboard
                   </a>
                 </li>
-                <li><a>Cài đặt</a></li>
                 <li id="btn-logout"><a>Đăng xuất</a></li>
             </div>
           </div>

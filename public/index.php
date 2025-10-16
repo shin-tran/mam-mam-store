@@ -1,5 +1,6 @@
 <?php
 
+use App\Controllers\Api\UserController;
 use App\Controllers\DashboardController;
 date_default_timezone_set("Asia/Ho_Chi_Minh");
 session_start();
@@ -18,6 +19,8 @@ use App\Controllers\PageController;
 use App\Controllers\Api\AuthController as ApiAuthController;
 use App\Controllers\Api\ProductController as ApiProductController;
 use App\Helpers\Helpers;
+
+Helpers::initializeUserSession();
 
 $router = new Router();
 
@@ -59,9 +62,10 @@ $router->post('/api/reset-password', ApiAuthController::class, 'handleResetPassw
 
 // API yêu cầu Auth và Permission
 $router->post('/api/products/create', ApiProductController::class, 'create', [
-  'sanitize',
-  'auth',
-  'admin'
+  'sanitize', 'auth', 'admin'
+]);
+$router->post('/api/users/delete/{id}', UserController::class, 'delete', [
+  'sanitize', 'auth', 'admin'
 ]);
 
 

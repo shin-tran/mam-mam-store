@@ -15,6 +15,27 @@ class User {
 
   // IDEA: thêm construct có tham số là email user hoặc id
 
+  public function getAllUsersWithRoles() {
+    $sql = "SELECT
+              u.id,
+              u.full_name,
+              u.email,
+              u.phone_number,
+              u.address,
+              u.is_activated,
+              GROUP_CONCAT(r.name SEPARATOR ', ') as roles
+            FROM users u
+            LEFT JOIN role_user ru ON u.id = ru.user_id
+            LEFT JOIN roles r ON ru.role_id = r.id
+            GROUP BY u.id
+            ORDER BY u.created_at DESC";
+    return $this->db->getAll($sql);
+  }
+
+  public function deleteUser(int $userId) {
+    return $this->db->delete('users', 'id = :id', ['id' => $userId]);
+  }
+
   public function emailExists(string $email) {
     $count = $this->db->countRows("SELECT id FROM `users` WHERE `email` = ?", [$email]);
     return $count > 0;

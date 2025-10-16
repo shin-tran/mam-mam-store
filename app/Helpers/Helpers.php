@@ -1,6 +1,8 @@
 <?php
 namespace App\Helpers;
 
+use App\Models\RefreshToken;
+use App\Models\User;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
@@ -162,5 +164,38 @@ class Helpers {
       return !empty(array_intersect($role, $user['roles']));
     }
     return in_array($role, $user['roles']);
+  }
+
+  public static function initializeUserSession() {
+    // Nếu session đã có thông tin user, không cần làm gì cả
+    if (isset($_SESSION['user'])) {
+      return;
+    }
+
+    // Nếu không có refresh token trong cookie, user chưa đăng nhập
+    $refreshToken = $_COOKIE['refresh_token'] ?? null;
+    if (!$refreshToken) {
+      return;
+    }
+
+    // Xác thực refresh token và lấy thông tin user
+    $tokenModel = new RefreshToken();
+    $refreshTokenHash = hash('sha256', $refreshToken);
+    $tokenData = $tokenModel->findValidTokenByHash($refreshTokenHash);
+
+    if ($tokenData) {
+      $userModel = new User();
+      $user = $userModel->findUserById($tokenData['user_id']);
+      if ($user) {
+        $roles = array_column($userModel->getRolesUser($user['id']), 'name');
+        // Khôi phục thông tin vào session
+        $_SESSION['user'] = [
+          'id' => $user['id'],
+          'full_name' => $user['full_name'],
+          'email' => $user['email'],
+          'roles' => $roles,
+        ];
+      }
+    }
   }
 }
