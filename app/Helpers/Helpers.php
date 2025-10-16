@@ -156,14 +156,14 @@ class Helpers {
 
   public static function userHasRole($role) {
     $user = self::getCurrentUser();
-    if (!$user || !isset($user['roles'])) {
+    if (!$user || !isset($user['role'])) {
       return false;
     }
     if (is_array($role)) {
       // Check if user has any of the roles in the array
-      return !empty(array_intersect($role, $user['roles']));
+      return !empty(array_intersect($role, $user['role']));
     }
-    return in_array($role, $user['roles']);
+    return in_array($role, $user['role']);
   }
 
   public static function initializeUserSession() {
@@ -187,13 +187,13 @@ class Helpers {
       $userModel = new User();
       $user = $userModel->findUserById($tokenData['user_id']);
       if ($user) {
-        $roles = array_column($userModel->getRolesUser($user['id']), 'name');
+        $role = array_column($userModel->getRoleUser($user['id']), 'name');
         // Khôi phục thông tin vào session
         $_SESSION['user'] = [
           'id' => $user['id'],
           'full_name' => $user['full_name'],
           'email' => $user['email'],
-          'roles' => $roles,
+          'role' => $role,
         ];
       }
     }

@@ -67,6 +67,9 @@ $router->post('/api/products/create', ApiProductController::class, 'create', [
 $router->post('/api/users/delete/{id}', UserController::class, 'delete', [
   'sanitize', 'auth', 'admin'
 ]);
+$router->post('/api/users/update/{id}', UserController::class, 'update', [
+  'sanitize', 'auth', 'admin'
+]);
 
 
 // --- DISPATCH ROUTER ---

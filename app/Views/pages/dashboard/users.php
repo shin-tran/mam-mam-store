@@ -39,7 +39,7 @@
               <br />
               <span class="badge badge-ghost badge-sm"><?php echo htmlspecialchars($user['phone_number'] ?? 'Chưa có SĐT'); ?></span>
             </td>
-            <td><?php echo htmlspecialchars($user['roles'] ?? 'Chưa có vai trò'); ?></td>
+            <td><?php echo htmlspecialchars($user['role'] ?? 'Chưa có vai trò'); ?></td>
             <td>
               <?php if ($user['is_activated']): ?>
                 <span class="badge badge-success badge-sm">Đã kích hoạt</span>
@@ -48,7 +48,14 @@
               <?php endif; ?>
             </td>
             <th>
-              <button class="btn btn-ghost">Sửa</button>
+              <button
+                class="btn btn-ghost btn-edit"
+                data-user-id="<?php echo $user['id']; ?>"
+                data-user-name="<?php echo htmlspecialchars($user['full_name']); ?>"
+                data-user-phone="<?php echo htmlspecialchars($user['phone_number'] ?? ''); ?>"
+                data-user-address="<?php echo htmlspecialchars($user['address'] ?? ''); ?>"
+                data-user-role="<?php echo htmlspecialchars($user['role'] ?? ''); ?>"
+              >Sửa</button>
               <button
                 class="btn btn-ghost text-error btn-delete"
                 data-user-id="<?php echo $user['id']; ?>"
@@ -68,6 +75,85 @@
     </tbody>
   </table>
 </div>
+
+<!-- Edit User Modal -->
+<dialog
+  id="edit_user_modal"
+  class="modal"
+>
+  <div class="modal-box">
+    <h3 class="font-bold text-lg">Chỉnh sửa thông tin người dùng</h3>
+    <form id="edit-user-form">
+      <input
+        type="hidden"
+        name="user_id"
+        id="edit-user-id"
+      >
+      <div class="py-4 space-y-4 [&>div]:w-full">
+        <div class="form-control flex justify-between">
+          <label class="label"><span class="label-text required">Họ Tên</span></label>
+          <input
+            type="text"
+            name="full_name"
+            id="edit-full-name"
+            class="input input-bordered"
+            required
+          />
+        </div>
+
+        <div class="form-control flex justify-between">
+          <label class="label"><span class="label-text">Số điện thoại</span></label>
+          <input
+            type="tel"
+            name="phone_number"
+            id="edit-phone-number"
+            class="input input-bordered"
+          />
+        </div>
+
+        <div class="form-control flex justify-between">
+          <label class="label"><span class="label-text">Địa chỉ</span></label>
+          <textarea
+            name="address"
+            id="edit-address"
+            class="textarea textarea-bordered"
+          ></textarea>
+        </div>
+
+        <div class="form-control flex justify-between">
+          <label class="label"><span class="label-text required">Vai trò</span></label>
+          <select
+            id="edit-role"
+            name="role_id"
+            class="select select-bordered"
+            required
+          >
+            <option
+              disabled
+              selected
+            >Chọn vai trò</option>
+            <?php foreach ($allRoles as $role): ?>
+              <option value="<?php echo $role['id']; ?>">
+                <?php echo htmlspecialchars($role['name']); ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+      </div>
+      <div class="modal-action">
+        <button
+          type="button"
+          class="btn"
+          onclick="edit_user_modal.close()"
+        >Hủy</button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+        >Lưu thay đổi</button>
+      </div>
+    </form>
+  </div>
+</dialog>
 
 <!-- Delete Confirmation Modal -->
 <dialog

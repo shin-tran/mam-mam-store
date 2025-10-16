@@ -5,7 +5,7 @@ use App\Helpers\Helpers;
 
 class PermissionMiddleware {
   public static function handle(object $userData, string $requiredPermission) {
-    $userRoles = $userData->data->roles ?? [];
+    $userRoles = $userData->data->role ?? [];
 
     // admin truy cập mọi chức năng
     if (in_array('admin', $userRoles))
