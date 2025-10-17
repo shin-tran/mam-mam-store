@@ -19,6 +19,7 @@ use App\Controllers\Api\AuthController as ApiAuthController;
 use App\Controllers\Api\UserController as ApiUserController;
 use App\Controllers\Api\ProductController as ApiProductController;
 use App\Controllers\Api\CategoryController as ApiCategoryController;
+use App\Controllers\Api\OrderController as ApiOrderController;
 use App\Helpers\Helpers;
 
 Helpers::initializeUserSession();
@@ -81,6 +82,14 @@ $router->post('/api/categories/update/{id}', ApiCategoryController::class, 'upda
   'sanitize', 'auth', 'admin'
 ]);
 $router->post('/api/categories/delete/{id}', ApiCategoryController::class, 'delete', [
+  'sanitize', 'auth', 'admin'
+]);
+
+// Order API Routes
+$router->get('/api/orders/{id}', ApiOrderController::class, 'getDetails', [
+  'sanitize', 'auth', 'admin'
+]);
+$router->post('/api/orders/update-status/{id}', ApiOrderController::class, 'updateStatus', [
   'sanitize', 'auth', 'admin'
 ]);
 
