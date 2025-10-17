@@ -13,7 +13,13 @@ class User {
     $this->db = new Database();
   }
 
-  // IDEA: thêm construct có tham số là email user hoặc id
+  public function getNewUserCountThisMonth() {
+    $sql = "SELECT COUNT(`id`) as `new_users`
+                FROM `users`
+                WHERE MONTH(`created_at`) = MONTH(CURRENT_DATE()) AND YEAR(`created_at`) = YEAR(CURRENT_DATE())";
+    $result = $this->db->getOne($sql);
+    return $result['new_users'] ?? 0;
+  }
 
   public function getAllUsersWithRole() {
     $sql = "SELECT

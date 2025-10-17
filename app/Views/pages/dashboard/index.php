@@ -1,21 +1,21 @@
 <!-- Stats Cards -->
-<div class="stats shadow w-full mb-2 stats-vertical lg:stats-horizontal">
+<div class="stats shadow w-full mb-6 stats-vertical lg:stats-horizontal">
   <div class="stat">
     <div class="stat-title">Doanh thu tháng này</div>
-    <div class="stat-value text-primary">25.600.000 ₫</div>
-    <div class="stat-desc">Tăng 21% so với tháng trước</div>
+    <div class="stat-value text-primary"><?php echo number_format($stats['monthly_revenue'] ?? 0, 0, ',', '.'); ?> ₫</div>
+    <div class="stat-desc">Chỉ tính đơn hàng đã hoàn thành</div>
   </div>
 
   <div class="stat">
     <div class="stat-title">Đơn hàng mới</div>
-    <div class="stat-value text-secondary">1,256</div>
-    <div class="stat-desc">Tăng 15% so với tuần trước</div>
+    <div class="stat-value text-secondary"><?php echo $stats['new_orders_count'] ?? 0; ?></div>
+    <div class="stat-desc">Các đơn hàng đang chờ xử lý</div>
   </div>
 
   <div class="stat">
     <div class="stat-title">Khách hàng mới</div>
-    <div class="stat-value">422</div>
-    <div class="stat-desc">90 người trong hôm nay</div>
+    <div class="stat-value"><?php echo $stats['new_users_count'] ?? 0; ?></div>
+    <div class="stat-desc">Tài khoản đăng ký trong tháng này</div>
   </div>
 </div>
 
@@ -35,51 +35,48 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <th>#89412</th>
-            <td>Trần Văn An</td>
-            <td>04/10/2025</td>
-            <td>250.000 ₫</td>
-            <td>
-              <div class="badge badge-success">Đã giao</div>
-            </td>
-          </tr>
-          <tr>
-            <th>#89411</th>
-            <td>Nguyễn Thị Bình</td>
-            <td>04/10/2025</td>
-            <td>120.000 ₫</td>
-            <td>
-              <div class="badge badge-warning">Đang xử lý</div>
-            </td>
-          </tr>
-          <tr>
-            <th>#89410</th>
-            <td>Lê Minh Cường</td>
-            <td>03/10/2025</td>
-            <td>560.000 ₫</td>
-            <td>
-              <div class="badge badge-success">Đã giao</div>
-            </td>
-          </tr>
-          <tr>
-            <th>#89409</th>
-            <td>Phạm Thùy Dung</td>
-            <td>02/10/2025</td>
-            <td>85.000 ₫</td>
-            <td>
-              <div class="badge badge-error">Đã hủy</div>
-            </td>
-          </tr>
-          <tr>
-            <th>#89408</th>
-            <td>Võ Thành Long</td>
-            <td>01/10/2025</td>
-            <td>310.000 ₫</td>
-            <td>
-              <div class="badge badge-success">Đã giao</div>
-            </td>
-          </tr>
+          <?php if (!empty($recentOrders)): ?>
+            <?php foreach ($recentOrders as $order): ?>
+              <tr>
+                <th class="font-semibold">#<?php echo $order['id']; ?></th>
+                <td><?php echo htmlspecialchars($order['customer_name']); ?></td>
+                <td><?php echo date('d/m/Y H:i', strtotime($order['order_date'])); ?></td>
+                <td><?php echo number_format($order['total_amount'], 0, ',', '.'); ?> ₫</td>
+                <td>
+                  <?php
+                  $status_text = '';
+                  $badge_class = '';
+                  switch ($order['status']) {
+                    case 'pending':
+                      $status_text = 'Đang xử lý';
+                      $badge_class = 'badge-warning';
+                      break;
+                    case 'shipping':
+                      $status_text = 'Đang giao';
+                      $badge_class = 'badge-info';
+                      break;
+                    case 'completed':
+                      $status_text = 'Hoàn thành';
+                      $badge_class = 'badge-success';
+                      break;
+                    case 'cancelled':
+                      $status_text = 'Đã hủy';
+                      $badge_class = 'badge-error';
+                      break;
+                  }
+                  ?>
+                  <div class="badge <?php echo $badge_class; ?> badge-sm"><?php echo $status_text; ?></div>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <tr>
+              <td
+                colspan="5"
+                class="text-center"
+              >Chưa có đơn hàng nào gần đây.</td>
+            </tr>
+          <?php endif; ?>
         </tbody>
       </table>
     </div>

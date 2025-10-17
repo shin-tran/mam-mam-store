@@ -13,6 +13,7 @@ CREATE TABLE
     `phone_number` VARCHAR(15),
     `password` VARCHAR(255) NOT NULL,
     `address` TEXT,
+    `avatar_path` VARCHAR(255),
     `email_verification_token` VARCHAR(255),
     `verification_expires_at` DATETIME NULL,
     `forgot_password_token` VARCHAR(255),

@@ -37,4 +37,29 @@ class Order {
     }
     return $this->db->update('orders', ['status' => $status], 'id = :id', ['id' => $orderId]);
   }
+
+  // --- Dashboard Methods ---
+
+  public function getThisMonthRevenue() {
+    $sql = "SELECT SUM(total_amount) as total_revenue
+                FROM orders
+                WHERE status = 'completed' AND MONTH(order_date) = MONTH(CURRENT_DATE()) AND YEAR(order_date) = YEAR(CURRENT_DATE())";
+    $result = $this->db->getOne($sql);
+    return $result['total_revenue'] ?? 0;
+  }
+
+  public function getNewOrdersCount() {
+    $sql = "SELECT COUNT(id) as new_orders FROM orders WHERE status = 'pending'";
+    $result = $this->db->getOne($sql);
+    return $result['new_orders'] ?? 0;
+  }
+
+  public function getRecentOrders($limit = 5) {
+    $sql = "SELECT o.id, u.full_name as customer_name, o.order_date, o.total_amount, o.status
+                FROM orders o
+                JOIN users u ON o.user_id = u.id
+                ORDER BY o.order_date DESC
+                LIMIT :limit";
+    return $this->db->getAll($sql, ['limit' => $limit]);
+  }
 }
