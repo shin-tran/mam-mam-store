@@ -95,9 +95,11 @@ View::layout('head', ['title' => $title]);
                   <div class="w-10 rounded-full">
                     <img
                       alt="User avatar"
-                      src="https://placehold.co/40x40?text=<?php
+                      src="<?php
                       $split = explode(" ", $_SESSION['user']['full_name']);
-                      echo $split[count($split) - 1];
+                      echo $_SESSION['user']['avatar_path']
+                        ? _HOST_URL_PUBLIC.$_SESSION['user']['avatar_path']
+                        : "https://placehold.co/40x40?text={$split[count($split) - 1]}";
                       ?>"
                     />
                   </div>
@@ -107,8 +109,11 @@ View::layout('head', ['title' => $title]);
                   class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-37 p-2 shadow [&_li>*]:text-sm"
                 >
                   <li>
-                    <a class="justify-between">
-                      Thông tin cá nhân
+                    <a
+                      href="<?php echo _HOST_URL ?>/profile"
+                      class="justify-between"
+                    >
+                      Hồ sơ của bạn
                     </a>
                   </li>
                   </li>

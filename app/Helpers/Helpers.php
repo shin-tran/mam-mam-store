@@ -194,6 +194,7 @@ class Helpers {
           'full_name' => $user['full_name'],
           'email' => $user['email'],
           'role' => $role,
+          'avatar_path' => $user['avatar_path']
         ];
       }
     }
