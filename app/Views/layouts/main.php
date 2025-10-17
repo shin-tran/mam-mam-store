@@ -42,31 +42,6 @@ View::layout('head', ['title' => $title]);
               >Măm Măm Store</a>
           </div>
 
-          <!-- Navbar items -->
-          <!-- <div class="hidden flex-none lg:flex">
-            <ul class="menu menu-horizontal">
-              <li class="dropdown dropdown-hover pb-1 -mb-1">
-                <div
-                  tabindex="0"
-                  role="button"
-                  class="menu-item"
-                >Danh Mục Sản Phẩm</div>
-                <ul
-                  tabindex="0"
-                  class="dropdown-content menu w-fit bg-base-100 rounded-box z-1 shadow-sm mt-1!"
-                >
-                  <?php if (!empty($categories)): ?>
-                    <?php foreach ($categories as $category): ?>
-                      <li><a><?php echo htmlspecialchars($category['category_name']); ?></a></li>
-                    <?php endforeach; ?>
-                  <?php else: ?>
-                    <li><a>Không có danh mục</a></li>
-                  <?php endif; ?>
-                </ul>
-              </li>
-            </ul>
-          </div> -->
-
           <!-- Action user -->
           <div>
             <?php if (Helpers::isLoggedIn()): ?>
@@ -79,7 +54,10 @@ View::layout('head', ['title' => $title]);
                         src="<?php echo _HOST_URL_PUBLIC ?>/icons/shopping-cart.svg"
                         alt="Shopping cart icon"
                       >
-                      <span class="badge badge-sm indicator-item">0</span>
+                      <span
+                        id="cart-badge"
+                        class="badge badge-sm indicator-item"
+                      >0</span>
                     </div>
                   </div>
                 </a>
@@ -94,19 +72,18 @@ View::layout('head', ['title' => $title]);
                 >
                   <div class="w-10 rounded-full">
                     <img
+                      id="nav-user-avatar"
                       alt="User avatar"
-                      src="<?php
-                      $split = explode(" ", $_SESSION['user']['full_name']);
-                      echo $_SESSION['user']['avatar_path']
+                      src="<?php echo $_SESSION['user']['avatar_path']
                         ? _HOST_URL_PUBLIC.$_SESSION['user']['avatar_path']
-                        : "https://placehold.co/40x40?text={$split[count($split) - 1]}";
+                        : 'https://placehold.co/40x40?text='.mb_substr($_SESSION['user']['full_name'], 0, 1);
                       ?>"
                     />
                   </div>
                 </div>
                 <ul
                   tabindex="0"
-                  class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-37 p-2 shadow [&_li>*]:text-sm"
+                  class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-48 p-2 shadow [&_li>*]:text-sm"
                 >
                   <li>
                     <a
@@ -115,7 +92,6 @@ View::layout('head', ['title' => $title]);
                     >
                       Hồ sơ của bạn
                     </a>
-                  </li>
                   </li>
                   <?php if (!Helpers::userHasRole('customer')): ?>
                     <li>

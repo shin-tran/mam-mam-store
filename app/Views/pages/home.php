@@ -71,7 +71,7 @@
               <figure class="px-2 pt-2">
                 <a href="<?php echo _HOST_URL."/product/{$product['id']}"; ?>">
                   <img
-                    src="<?php echo htmlspecialchars($product['image_path'] ?? 'https://placehold.co/400x400?text=Măm+Măm'); ?>"
+                    src="<?php echo _HOST_URL_PUBLIC.htmlspecialchars($product['image_path'] ?? 'https://placehold.co/400x400?text=Măm+Măm'); ?>"
                     alt="<?php echo htmlspecialchars($product['product_name']); ?>"
                     class="rounded-t-xl h-48 w-full object-cover"
                     onerror="this.onerror=null;this.src='https://placehold.co/400x400?text=Măm+Măm';"
@@ -81,11 +81,17 @@
               <div class="card-body items-center text-center p-4">
                 <h2 class="card-title"><?php echo htmlspecialchars($product['product_name']); ?></h2>
                 <p class="font-semibold text-primary"><?php echo number_format($product['price'], 0, ',', '.'); ?> ₫</p>
-                <div class="card-actions">
+                <div class="card-actions join">
                   <button
-                    class="btn btn-primary add-to-cart-btn"
+                    class="btn btn-primary btn-sm join-item add-to-cart-btn"
                     data-id="<?php echo $product['id']; ?>"
+                    data-stock="<?php echo $product['stock_quantity']; ?>"
                   >Thêm vào giỏ</button>
+                  <button
+                    class="btn btn-secondary btn-sm join-item buy-now-btn"
+                    data-id="<?php echo $product['id']; ?>"
+                    data-stock="<?php echo $product['stock_quantity']; ?>"
+                  >Mua ngay</button>
                 </div>
               </div>
             </div>
