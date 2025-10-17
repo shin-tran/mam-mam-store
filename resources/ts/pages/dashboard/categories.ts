@@ -99,8 +99,7 @@ categoryForm?.addEventListener("submit", async (e) => {
 
     if (result.success) {
       toastManager.createToast({ message: result.message, type: "success" });
-      // Tải lại trang để cập nhật danh sách
-      setTimeout(() => window.location.reload(), 1500);
+      window.location.reload()
     } else {
       toastManager.createToast({ message: result.message, type: "error" });
     }

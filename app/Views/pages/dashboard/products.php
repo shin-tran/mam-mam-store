@@ -6,7 +6,10 @@
 </div>
 
 <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
-  <table class="table">
+  <table
+    class="table"
+    id="products-table"
+  >
     <!-- head -->
     <thead>
       <tr>
@@ -20,7 +23,7 @@
     <tbody>
       <?php if (!empty($products)): ?>
         <?php foreach ($products as $product): ?>
-          <tr>
+          <tr data-product-id="<?php echo $product['id']; ?>">
             <td>
               <div class="flex items-center gap-3">
                 <div class="avatar">
@@ -36,16 +39,29 @@
                   </div>
                 </div>
                 <div>
-                  <div class="font-bold"><?php echo htmlspecialchars($product['product_name']); ?></div>
+                  <div class="font-bold product-name"><?php echo htmlspecialchars($product['product_name']); ?></div>
                 </div>
               </div>
             </td>
-            <td><?php echo htmlspecialchars($product['category_name'] ?? 'N/A'); ?></td>
+            <td data-category-id="<?php echo $product['category_id']; ?>"><?php echo htmlspecialchars($product['category_name'] ?? 'N/A'); ?></td>
             <td><?php echo number_format($product['price'], 0, ',', '.'); ?> ₫</td>
             <td><?php echo $product['stock_quantity']; ?></td>
-            <th>
-              <button class="btn btn-ghost">Sửa</button>
-              <button class="btn btn-ghost text-error">Xóa</button>
+            <th class="text-right">
+              <button
+                class="btn btn-ghost btn-edit"
+                data-product-id="<?php echo $product['id']; ?>"
+                data-product-name="<?php echo htmlspecialchars($product['product_name']); ?>"
+                data-product-price="<?php echo $product['price']; ?>"
+                data-product-stock="<?php echo $product['stock_quantity']; ?>"
+                data-product-category="<?php echo $product['category_id']; ?>"
+                data-product-description="<?php echo htmlspecialchars($product['description'] ?? ''); ?>"
+                data-product-image="<?php echo htmlspecialchars($product['image_path'] ?? ''); ?>"
+              >Sửa</button>
+              <button
+                class="btn btn-ghost text-error btn-delete"
+                data-product-id="<?php echo $product['id']; ?>"
+                data-product-name="<?php echo htmlspecialchars($product['product_name']); ?>"
+              >Xóa</button>
             </th>
           </tr>
         <?php endforeach; ?>
@@ -72,7 +88,7 @@
       id="add-product-form"
       novalidate
     >
-      <div class="flex flex-col gap-4 [&>div]:w-full">
+      <div class="space-y-4 [&>div]:w-full">
         <div class="form-control flex justify-between">
           <label class="label"><span class="label-text required">Tên sản phẩm</span></label>
           <input
@@ -83,9 +99,8 @@
             required
           />
         </div>
-
         <div class="form-control flex justify-between">
-          <label class="label"><span class="label-text required">Giá</span></label>
+          <label class="label"><span class="label-text required">Giá (VND)</span></label>
           <input
             type="number"
             name="price"
@@ -94,7 +109,6 @@
             required
           />
         </div>
-
         <div class="form-control flex justify-between">
           <label class="label"><span class="label-text required">Số lượng</span></label>
           <input
@@ -105,7 +119,6 @@
             required
           />
         </div>
-
         <div class="form-control flex justify-between">
           <label class="label"><span class="label-text required">Danh mục</span></label>
           <select
@@ -116,13 +129,13 @@
             <option
               disabled
               selected
+              value=""
             >Chọn danh mục</option>
             <?php foreach ($categories as $category): ?>
               <option value="<?php echo $category['id']; ?>"><?php echo htmlspecialchars($category['category_name']); ?></option>
             <?php endforeach; ?>
           </select>
         </div>
-
         <div class="form-control flex justify-between">
           <label class="label"><span class="label-text">Mô tả</span></label>
           <textarea
@@ -131,8 +144,7 @@
             placeholder="Mô tả chi tiết về sản phẩm"
           ></textarea>
         </div>
-
-        <div class="form-control">
+        <div class="form-control flex justify-between">
           <label class="label"><span class="label-text required">Hình ảnh</span></label>
           <input
             type="file"
@@ -140,13 +152,13 @@
             id="image-input"
             class="file-input file-input-bordered"
             accept="image/png, image/jpeg, image/webp"
+            required
           />
           <div
             id="image-preview-container"
-            class="mt-4 items-center grid grid-cols-2 sm:grid-cols-4 gap-2"
+            class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2"
           ></div>
         </div>
-
       </div>
       <div class="modal-action">
         <button
@@ -160,6 +172,131 @@
         >Lưu sản phẩm</button>
       </div>
     </form>
+  </div>
+</dialog>
+
+<!-- Edit Product Modal -->
+<dialog
+  id="edit_product_modal"
+  class="modal"
+>
+  <div class="modal-box">
+    <h3 class="font-bold text-2xl mb-4 text-center">Chỉnh sửa sản phẩm</h3>
+    <form
+      id="edit-product-form"
+      novalidate
+    >
+      <input
+        type="hidden"
+        name="product_id"
+        id="edit-product-id"
+      />
+      <div class="space-y-4 [&>div]:w-full">
+        <div class="form-control flex justify-between">
+          <label class="label"><span class="label-text required">Tên sản phẩm</span></label>
+          <input
+            type="text"
+            name="product_name"
+            id="edit-product-name"
+            class="input input-bordered"
+            required
+          />
+        </div>
+        <div class="form-control flex justify-between">
+          <label class="label"><span class="label-text required">Giá (VND)</span></label>
+          <input
+            type="number"
+            name="price"
+            id="edit-product-price"
+            class="input input-bordered"
+            required
+          />
+        </div>
+        <div class="form-control flex justify-between">
+          <label class="label"><span class="label-text required">Số lượng</span></label>
+          <input
+            type="number"
+            name="stock_quantity"
+            id="edit-product-stock"
+            class="input input-bordered"
+            required
+          />
+        </div>
+        <div class="form-control flex justify-between">
+          <label class="label"><span class="label-text required">Danh mục</span></label>
+          <select
+            name="category_id"
+            id="edit-product-category"
+            class="select select-bordered"
+            required
+          >
+            <option
+              disabled
+              value=""
+            >Chọn danh mục</option>
+            <?php foreach ($categories as $category): ?>
+              <option value="<?php echo $category['id']; ?>"><?php echo htmlspecialchars($category['category_name']); ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="form-control flex justify-between">
+          <label class="label"><span class="label-text">Mô tả</span></label>
+          <textarea
+            name="description"
+            id="edit-product-description"
+            class="textarea textarea-bordered"
+          ></textarea>
+        </div>
+        <div class="form-control">
+          <label class="label"><span class="label-text">Hình ảnh (để trống nếu không muốn đổi)</span></label>
+          <input
+            type="file"
+            name="image"
+            id="edit-image-input"
+            class="file-input file-input-bordered"
+            accept="image/png, image/jpeg, image/webp"
+          />
+          <div
+            id="edit-image-preview-container"
+            class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2"
+          ></div>
+        </div>
+      </div>
+      <div class="modal-action">
+        <button
+          type="button"
+          class="btn"
+          onclick="edit_product_modal.close()"
+        >Hủy</button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+        >Lưu thay đổi</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<!-- Delete Product Modal -->
+<dialog
+  id="delete_product_modal"
+  class="modal"
+>
+  <div class="modal-box">
+    <h3 class="font-bold text-lg text-error">Xác nhận xóa sản phẩm!</h3>
+    <p class="py-4">Bạn có chắc chắn muốn xóa sản phẩm "<strong id="product-name-to-delete"></strong>"? Hành động này không thể hoàn tác.</p>
+    <div class="modal-action">
+      <form
+        method="dialog"
+        class="w-full flex justify-end gap-2"
+      >
+        <button class="btn">Hủy</button>
+        <button
+          id="confirm-delete-product-btn"
+          class="btn btn-error"
+        >Xóa</button>
+      </form>
+    </div>
   </div>
 </dialog>
 
