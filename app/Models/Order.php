@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use App\Core\Database;
+use Exception;
 
 class Order {
   private $db;
@@ -38,6 +39,54 @@ class Order {
     return $this->db->update('orders', ['status' => $status], 'id = :id', ['id' => $orderId]);
   }
 
+  public function createOrder(int $userId, array $cartItems, array $shippingInfo, float $totalAmount) {
+    $this->db->beginTransaction();
+    try {
+      // 1. Chèn vào bảng orders
+      $orderData = [
+        'user_id' => $userId,
+        'total_amount' => $totalAmount,
+        'shipping_address' => $shippingInfo['address'],
+        'shipping_phone' => $shippingInfo['phone'],
+        'note' => $shippingInfo['note'] ?? null,
+        'status' => 'pending'
+      ];
+      $orderId = $this->db->insert('orders', $orderData);
+      if (!$orderId) {
+        throw new Exception("Không thể tạo đơn hàng.");
+      }
+
+      // 2. Chèn vào order_details và cập nhật số lượng tồn kho
+      foreach ($cartItems as $item) {
+        $orderDetailData = [
+          'order_id' => $orderId,
+          'product_id' => $item['id'],
+          'quantity' => $item['quantity'],
+          'price_at_purchase' => $item['price']
+        ];
+        if (!$this->db->insert('order_details', $orderDetailData)) {
+          throw new Exception("Không thể lưu chi tiết đơn hàng cho sản phẩm ID: ".$item['id']);
+        }
+
+        // 3. Cập nhật số lượng sản phẩm
+        $sql = "UPDATE `products` SET `stock_quantity` = `stock_quantity` - ? WHERE `id` = ? AND `stock_quantity` >= ?";
+        $updateSuccess = $this->db->query($sql, [$item['quantity'], $item['id'], $item['quantity']]);
+
+        if ($updateSuccess->rowCount() == 0) {
+          throw new Exception("Không đủ số lượng cho sản phẩm ID: ".$item['id']);
+        }
+      }
+
+      $this->db->commit();
+      return $orderId;
+    } catch (Exception $e) {
+      $this->db->rollBack();
+      $this->db->writeErrorLog($e);
+      return false;
+    }
+  }
+
+
   // --- Dashboard Methods ---
 
   public function getThisMonthRevenue() {
@@ -59,8 +108,8 @@ class Order {
                 FROM `orders` o
                 JOIN `users` u ON o.user_id = u.id
                 ORDER BY o.order_date DESC
-                LIMIT :limit";
-    return $this->db->getAll($sql, ['limit' => $limit]);
+                LIMIT $limit";
+    return $this->db->getAll($sql);
   }
 
   public function getOrdersByUserId(int $userId) {

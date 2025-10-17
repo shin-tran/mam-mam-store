@@ -33,3 +33,16 @@ export interface LoginResponse {
   access_token: string;
   expires_in: number;
 }
+
+export interface CartItem {
+  productId: string;
+  quantity: number;
+}
+
+export interface ProductDetail {
+  id: number;
+  product_name: string;
+  price: number;
+  image_path: string;
+  stock_quantity: number;
+}

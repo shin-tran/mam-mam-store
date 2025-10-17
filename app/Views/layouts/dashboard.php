@@ -161,10 +161,14 @@ View::layout('head', ['title' => $title]);
       </ul>
     </div>
   </div>
-  <script
-    type="module"
-    src="<?php echo _HOST_URL_PUBLIC ?>/js/pages/dashboard/index.js"
-  ></script>
+
+  <script type="module">
+    import { authService } from "<?php echo _HOST_URL_PUBLIC ?>/js/services/auth-service.js";
+    const logoutBtn = document.getElementById("btn-logout");
+    logoutBtn?.addEventListener("click", async () => {
+      await authService.logout();
+    });
+  </script>
 </body>
 
 </html>

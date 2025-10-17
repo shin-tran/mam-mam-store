@@ -167,6 +167,15 @@ View::layout('head', ['title' => $title]);
       </ul>
     </nav>
   </div>
+
+  <script type="module">
+    import { authService } from "<?php echo _HOST_URL_PUBLIC ?>/js/services/auth-service.js";
+    const logoutBtn = document.getElementById("btn-logout");
+    logoutBtn?.addEventListener("click", async () => {
+      await authService.logout();
+      localStorage.removeItem("cart");
+    });
+  </script>
 </body>
 
 </html>

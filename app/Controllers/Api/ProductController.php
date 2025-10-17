@@ -48,6 +48,34 @@ class ProductController {
     }
   }
 
+  public function getCartProducts() {
+    if (!Helpers::isPost()) {
+      Helpers::sendJsonResponse(false, 'Phương thức không hợp lệ.', null, 405);
+    }
+
+    $json = file_get_contents('php://input');
+    $data = json_decode($json, true);
+    $productIds = $data['productIds'] ?? [];
+
+    if (empty($productIds) || !is_array($productIds)) {
+      // Trả về mảng rỗng nếu không có ID nào được cung cấp, đây không phải là lỗi.
+      Helpers::sendJsonResponse(true, 'Không có sản phẩm nào trong giỏ hàng.', []);
+      return;
+    }
+
+    // Làm sạch ID để đảm bảo chúng là số nguyên
+    $sanitizedIds = array_map('intval', $productIds);
+
+    try {
+      $productModel = new Product();
+      $products = $productModel->getProductsByIds($sanitizedIds);
+      Helpers::sendJsonResponse(true, 'Lấy thông tin sản phẩm thành công.', $products);
+    } catch (Exception $e) {
+      error_log("Get cart products error: ".$e->getMessage());
+      Helpers::sendJsonResponse(false, 'Lỗi hệ thống khi lấy thông tin sản phẩm.', null, 500);
+    }
+  }
+
   private function validateProductData($post, $files) {
     $errors = [];
 

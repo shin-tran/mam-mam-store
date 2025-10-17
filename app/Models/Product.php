@@ -15,8 +15,8 @@ class Product {
     $sql = "SELECT
               p.*,
               c.category_name
-            FROM products p
-            INNER JOIN categories c ON p.category_id = c.id
+            FROM `products` p
+            LEFT JOIN `categories` c ON p.category_id = c.id
             ORDER BY p.created_at DESC";
     return $this->db->getAll($sql);
   }
@@ -25,10 +25,22 @@ class Product {
     $sql = "SELECT
               p.*,
               c.category_name
-            FROM products p
-            INNER JOIN categories c ON p.category_id = c.id
+            FROM `products` p
+            LEFT JOIN `categories` c ON p.category_id = c.id
             WHERE p.id = :id";
     return $this->db->getOne($sql, ['id' => $productId]);
+  }
+
+  public function getProductsByIds(array $productIds) {
+    if (empty($productIds)) {
+      return [];
+    }
+    $placeholders = implode(',', array_fill(0, count($productIds), '?'));
+    $sql = "SELECT p.*, c.category_name
+              FROM `products` p
+              LEFT JOIN `categories` c ON p.category_id = c.id
+              WHERE p.id IN ($placeholders)";
+    return $this->db->getAll($sql, $productIds);
   }
 
   public function createProduct($postData, $imagePath) {
