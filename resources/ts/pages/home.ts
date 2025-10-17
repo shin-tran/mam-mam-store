@@ -3,7 +3,6 @@ import { toastManager } from "../toast-manager.js";
 import { Helpers } from "../utils/helpers.js";
 
 // === DOM Elements ===
-const logoutBtn = document.getElementById("btn-logout");
 const filterButtons =
   document.querySelectorAll<HTMLButtonElement>(".filter-btn");
 const searchInput = document.getElementById("search-input") as HTMLInputElement;
@@ -75,11 +74,6 @@ function addToCart(
 }
 
 // === Event Listeners ===
-logoutBtn?.addEventListener("click", async () => {
-  await authService.logout();
-  localStorage.removeItem("cart");
-});
-
 function filterProducts() {
   const searchTerm = searchInput.value.toLowerCase().trim();
   productCards.forEach((card) => {

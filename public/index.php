@@ -64,39 +64,45 @@ $router->post('/api/login', ApiAuthController::class, 'handleLogin', ['sanitize'
 $router->post('/api/forgot-password', ApiAuthController::class, 'handleForgotPassword', ['sanitize', 'guest']);
 $router->post('/api/reset-password', ApiAuthController::class, 'handleResetPassword', ['sanitize', 'guest']);
 
-// API yêu cầu Auth và Permission
+// API yêu cầu Auth
+$router->post('/api/products/cart', ApiProductController::class, 'getCartProducts', ['auth']);
+$router->post('/api/orders/create', ApiOrderController::class, 'create', ['auth', 'sanitize']);
+$router->get('/api/profile/info', ApiUserController::class, 'getProfileInfo', ['auth']);
+$router->post('/api/profile/update', ApiUserController::class, 'updateProfile', ['auth', 'sanitize']);
+$router->post('/api/profile/avatar', ApiUserController::class, 'updateAvatar', ['auth']);
+$router->post('/api/profile/change-password', ApiUserController::class, 'changePassword', ['auth', 'sanitize']);
+
+
+// API yêu cầu Auth và Permission (Admin)
 $router->post('/api/products/create', ApiProductController::class, 'create', [
-  'sanitize', 'auth', 'admin'
+  'sanitize', 'auth', 'permission:admin'
 ]);
 $router->post('/api/users/delete/{id}', ApiUserController::class, 'delete', [
-  'sanitize', 'auth', 'admin'
+  'sanitize', 'auth', 'permission:admin'
 ]);
 $router->post('/api/users/update/{id}', ApiUserController::class, 'update', [
-  'sanitize', 'auth', 'admin'
+  'sanitize', 'auth', 'permission:admin'
 ]);
 
 // Category API Routes
 $router->post('/api/categories/create', ApiCategoryController::class, 'create', [
-  'sanitize', 'auth', 'admin'
+  'sanitize', 'auth', 'permission:admin'
 ]);
 $router->post('/api/categories/update/{id}', ApiCategoryController::class, 'update', [
-  'sanitize', 'auth', 'admin'
+  'sanitize', 'auth', 'permission:admin'
 ]);
 $router->post('/api/categories/delete/{id}', ApiCategoryController::class, 'delete', [
-  'sanitize', 'auth', 'admin'
+  'sanitize', 'auth', 'permission:admin'
 ]);
 
 // Order API Routes
 $router->get('/api/orders/{id}', ApiOrderController::class, 'getDetails', [
-  'sanitize', 'auth', 'admin'
+  'sanitize', 'auth', 'permission:admin'
 ]);
 $router->post('/api/orders/update-status/{id}', ApiOrderController::class, 'updateStatus', [
-  'sanitize', 'auth', 'admin'
+  'sanitize', 'auth', 'permission:admin'
 ]);
 
-$router->post('/api/profile/update', ApiUserController::class, 'updateProfile', ['auth', 'sanitize']);
-$router->post('/api/profile/avatar', ApiUserController::class, 'updateAvatar', ['auth']);
-$router->post('/api/profile/change-password', ApiUserController::class, 'changePassword', ['auth', 'sanitize']);
 
 // --- DISPATCH ROUTER ---
 $requestUri = $_SERVER['REQUEST_URI'];
@@ -107,4 +113,3 @@ $finalPath = Helpers::removePathFolder($requestPath);
 $router->dispatch($finalPath, $requestMethod);
 
 ob_end_flush(); // gửi (flush) toàn bộ ra trình duyệt và dọn dẹp bộ nhớ đệm
-

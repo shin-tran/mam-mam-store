@@ -6,6 +6,26 @@ use App\Models\User;
 use Exception;
 
 class UserController {
+
+  public function getProfileInfo($userData) {
+    $userId = $userData->data->userId;
+    $userModel = new User();
+    $user = $userModel->findUserById($userId);
+
+    if ($user) {
+      // Hủy các trường nhạy cảm trước khi gửi đi
+      unset($user['password']);
+      unset($user['email_verification_token']);
+      unset($user['verification_expires_at']);
+      unset($user['forgot_password_token']);
+      unset($user['forgot_password_expires_at']);
+
+      Helpers::sendJsonResponse(true, 'Lấy thông tin thành công.', $user);
+    } else {
+      Helpers::sendJsonResponse(false, 'Không tìm thấy người dùng.', null, 404);
+    }
+  }
+
   public function update($userId, $userData) {
     $idToUpdate = intval($userId);
     $role = $_POST['role_id'] ?? '';

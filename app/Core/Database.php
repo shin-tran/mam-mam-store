@@ -1,7 +1,7 @@
 <?php
 namespace App\Core;
 
-use PDO, Exception, PDOException;
+use PDO, Exception, PDOException, PDOStatement;
 
 class Database {
   private $connect;
@@ -29,6 +29,17 @@ class Database {
     $log_message .= "File: ".$ex->getFile()." Dòng: ".$ex->getLine()."\n";
     $log_message .= "Stack Trace: \n".$ex->getTraceAsString();
     error_log($log_message, 0);
+  }
+
+  public function query(string $sql, array $params = []): false|PDOStatement {
+    try {
+      $stm = $this->connect->prepare($sql);
+      $stm->execute($params);
+      return $stm;
+    } catch (PDOException $ex) {
+      $this->writeErrorLog($ex);
+      return false;
+    }
   }
 
   // lấy tất cả kết quả truy vấn
