@@ -25,7 +25,7 @@
               <tr data-category-id="<?php echo $category['id']; ?>">
                 <td class="font-semibold"><?php echo $category['id']; ?></td>
                 <td class="category-name"><?php echo htmlspecialchars($category['category_name']); ?></td>
-                <td class="text-right">
+                <td class="text-right flex">
                   <button
                     class="btn btn-ghost btn-edit-category"
                     data-category-id="<?php echo $category['id']; ?>"

@@ -44,22 +44,30 @@ class Product {
   }
 
   public function createProduct($postData, $imagePath) {
-    $this->db->beginTransaction();
-    try {
-      $data = array_merge($postData, ['image_path' => $imagePath]);
+    $data = [
+      'product_name' => $postData['product_name'],
+      'price' => $postData['price'],
+      'stock_quantity' => $postData['stock_quantity'],
+      'category_id' => $postData['category_id'],
+      'description' => $postData['description'] ?? null,
+      'image_path' => $imagePath,
+    ];
+    return $this->db->insert('products', $data);
+  }
 
-      $productId = $this->db->insert('products', $data);
-      if (!$productId) {
-        $this->db->rollBack();
-        return false;
-      }
+  public function updateProduct(int $id, array $postData, string $imagePath) {
+    $data = [
+      'product_name' => $postData['product_name'],
+      'price' => $postData['price'],
+      'stock_quantity' => $postData['stock_quantity'],
+      'category_id' => $postData['category_id'],
+      'description' => $postData['description'] ?? null,
+      'image_path' => $imagePath,
+    ];
+    return $this->db->update('products', $data, 'id = :id', ['id' => $id]);
+  }
 
-      $this->db->commit();
-      return true;
-    } catch (PDOException $ex) {
-      $this->db->rollBack();
-      $this->db->writeErrorLog($ex);
-      return false;
-    }
+  public function deleteProduct(int $id) {
+    return $this->db->delete('products', 'id = :id', ['id' => $id]);
   }
 }
