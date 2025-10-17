@@ -67,6 +67,7 @@ $router->post('/api/profile/change-password', ApiUserController::class, 'changeP
 // Admin APIs
 $router->post('/api/products/create', ApiProductController::class, 'create', ['sanitize', 'auth', 'permission:admin']);
 $router->post('/api/products/update/{id}', ApiProductController::class, 'update', ['sanitize', 'auth', 'permission:admin']);
+$router->post('/api/products/{id}/reviews', ApiProductController::class, 'createReview', ['auth', 'sanitize']);
 $router->post('/api/products/delete/{id}', ApiProductController::class, 'delete', ['auth', 'permission:admin']);
 $router->post('/api/users/delete/{id}', ApiUserController::class, 'delete', ['sanitize', 'auth', 'permission:admin']);
 $router->post('/api/users/update/{id}', ApiUserController::class, 'update', ['sanitize', 'auth', 'permission:admin']);

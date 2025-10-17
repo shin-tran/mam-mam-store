@@ -1,26 +1,19 @@
+import { authService } from "../services/auth-service.js";
 import { toastManager } from "../toast-manager.js";
-// Lấy các elements
+import { spinnerIcon } from "../utils/constants.js";
+// --- Phần Giỏ Hàng & Mua Hàng ---
 const quantityInput = document.getElementById("quantity");
 const decreaseBtn = document.querySelector(".btn-decrease");
 const increaseBtn = document.querySelector(".btn-increase");
 const addToCartBtn = document.querySelector(".add-to-cart-btn");
 const buyNowBtn = document.querySelector(".buy-now-btn");
-if (!quantityInput ||
-    !decreaseBtn ||
-    !increaseBtn ||
-    !addToCartBtn ||
-    !buyNowBtn) {
-    console.error("Không tìm thấy elements cần thiết");
-}
-else {
+if (quantityInput && decreaseBtn && increaseBtn && addToCartBtn && buyNowBtn) {
     const productId = addToCartBtn.dataset.id;
     const maxStock = parseInt(addToCartBtn.dataset.stock || "999");
-    // Hàm cập nhật số lượng
     function updateQuantity(value) {
         let newValue = parseInt(quantityInput.value) + value;
-        if (newValue < 1) {
+        if (newValue < 1)
             newValue = 1;
-        }
         if (newValue > maxStock) {
             toastManager.createToast({
                 message: `Chỉ còn ${maxStock} sản phẩm trong kho`,
@@ -31,21 +24,13 @@ else {
         quantityInput.value = newValue.toString();
         updateButtonStates();
     }
-    // Cập nhật trạng thái nút
     function updateButtonStates() {
         const currentValue = parseInt(quantityInput.value);
         decreaseBtn.disabled = currentValue <= 1;
         increaseBtn.disabled = currentValue >= maxStock;
     }
-    // Xử lý giảm số lượng
-    decreaseBtn.addEventListener("click", () => {
-        updateQuantity(-1);
-    });
-    // Xử lý tăng số lượng
-    increaseBtn.addEventListener("click", () => {
-        updateQuantity(1);
-    });
-    // Validate input thủ công
+    decreaseBtn.addEventListener("click", () => updateQuantity(-1));
+    increaseBtn.addEventListener("click", () => updateQuantity(1));
     quantityInput.addEventListener("input", () => {
         let value = parseInt(quantityInput.value);
         if (isNaN(value) || value < 1) {
@@ -60,8 +45,9 @@ else {
         }
         updateButtonStates();
     });
-    // Thêm vào giỏ hàng
-    addToCartBtn.addEventListener("click", async () => {
+    addToCartBtn.addEventListener("click", () => handleAddToCart(false));
+    buyNowBtn.addEventListener("click", () => handleAddToCart(true));
+    async function handleAddToCart(isBuyNow) {
         const quantity = parseInt(quantityInput.value);
         if (!productId) {
             toastManager.createToast({
@@ -70,46 +56,38 @@ else {
             });
             return;
         }
-        addToCartBtn.disabled = true;
-        addToCartBtn.innerHTML =
-            '<span class="loading loading-spinner"></span> Đang thêm...';
+        const button = isBuyNow ? buyNowBtn : addToCartBtn;
+        button.disabled = true;
+        button.innerHTML = `<span class="loading loading-spinner"></span> ${isBuyNow ? "Đang xử lý..." : "Đang thêm..."}`;
         try {
-            // Lấy giỏ hàng từ localStorage
             const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-            // Kiểm tra sản phẩm đã có trong giỏ chưa
             const existingItemIndex = cart.findIndex((item) => item.productId === productId);
             let newTotalQuantity = quantity;
             if (existingItemIndex > -1) {
-                // Tính tổng số lượng mới
                 newTotalQuantity = cart[existingItemIndex].quantity + quantity;
-                // Kiểm tra không vượt quá stock
                 if (newTotalQuantity > maxStock) {
                     toastManager.createToast({
                         message: `Không thể thêm! Giỏ hàng đã có ${cart[existingItemIndex].quantity} sản phẩm. Chỉ còn ${maxStock} sản phẩm trong kho.`,
                         type: "error",
                     });
-                    addToCartBtn.disabled = false;
-                    addToCartBtn.innerHTML = "Thêm vào giỏ hàng";
                     return;
                 }
-                // Cập nhật số lượng
                 cart[existingItemIndex].quantity = newTotalQuantity;
             }
             else {
-                // Thêm mới
-                cart.push({
-                    productId: productId,
-                    quantity: quantity,
-                    addedAt: new Date().toISOString(),
+                cart.push({ productId, quantity, addedAt: new Date().toISOString() });
+            }
+            localStorage.setItem("cart", JSON.stringify(cart));
+            updateCartBadge();
+            if (isBuyNow) {
+                window.location.href = "/orders";
+            }
+            else {
+                toastManager.createToast({
+                    message: "Đã thêm vào giỏ hàng",
+                    type: "success",
                 });
             }
-            // Lưu vào localStorage
-            localStorage.setItem("cart", JSON.stringify(cart));
-            // Cập nhật badge số lượng
-            updateCartBadge();
-            toastManager.createToast({
-                message: "Đã thêm vào giỏ hàng",
-            });
         }
         catch (error) {
             console.error("Error adding to cart:", error);
@@ -119,76 +97,64 @@ else {
             });
         }
         finally {
-            addToCartBtn.disabled = false;
-            addToCartBtn.innerHTML = "Thêm vào giỏ hàng";
+            button.disabled = false;
+            button.innerHTML = isBuyNow ? "Mua ngay" : "Thêm vào giỏ hàng";
         }
-    });
-    // Mua ngay
-    buyNowBtn.addEventListener("click", async () => {
-        const quantity = parseInt(quantityInput.value);
-        if (!productId) {
-            toastManager.createToast({
-                message: "Không tìm thấy sản phẩm",
-                type: "error",
-            });
-            return;
-        }
-        buyNowBtn.disabled = true;
-        buyNowBtn.innerHTML =
-            '<span class="loading loading-spinner"></span> Đang xử lý...';
-        try {
-            // Lấy giỏ hàng từ localStorage
-            const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-            const existingItemIndex = cart.findIndex((item) => item.productId === productId);
-            let newTotalQuantity = quantity;
-            if (existingItemIndex > -1) {
-                // Tính tổng số lượng mới
-                newTotalQuantity = cart[existingItemIndex].quantity + quantity;
-                // Kiểm tra không vượt quá stock
-                if (newTotalQuantity > maxStock) {
-                    toastManager.createToast({
-                        message: `Không thể mua! Giỏ hàng đã có ${cart[existingItemIndex].quantity} sản phẩm. Chỉ còn ${maxStock} sản phẩm trong kho.`,
-                        type: "error",
-                    });
-                    buyNowBtn.disabled = false;
-                    buyNowBtn.innerHTML = "Mua ngay";
-                    return;
-                }
-                // Cập nhật số lượng
-                cart[existingItemIndex].quantity = newTotalQuantity;
-            }
-            else {
-                // Thêm mới
-                cart.push({
-                    productId: productId,
-                    quantity: quantity,
-                    addedAt: new Date().toISOString(),
-                });
-            }
-            localStorage.setItem("cart", JSON.stringify(cart));
-            // Chuyển hướng đến trang thanh toán
-            window.location.href = "/orders";
-        }
-        catch (error) {
-            console.error("Error buying now:", error);
-            toastManager.createToast({
-                message: "Không thể thực hiện mua hàng",
-                type: "error",
-            });
-            buyNowBtn.disabled = false;
-            buyNowBtn.innerHTML = "Mua ngay";
-        }
-    });
-    // Hàm cập nhật badge giỏ hàng
+    }
     function updateCartBadge() {
         const cart = JSON.parse(localStorage.getItem("cart") || "[]");
         const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-        const badge = document.querySelector(".indicator-item");
-        if (badge) {
+        const badge = document.querySelector("#cart-badge");
+        if (badge)
             badge.textContent = totalItems.toString();
-        }
     }
-    // Khởi tạo
     updateButtonStates();
     updateCartBadge();
 }
+// --- Phần Đánh giá ---
+const reviewForm = document.getElementById("review-form");
+const reviewsList = document.getElementById("reviews-list");
+const noReviewsText = document.getElementById("no-reviews-text");
+const productId = addToCartBtn?.dataset.id;
+reviewForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!productId)
+        return;
+    const formData = new FormData(reviewForm);
+    const submitButton = reviewForm.querySelector('button[type="submit"]');
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.innerHTML = `${spinnerIcon} Đang gửi...`;
+    }
+    try {
+        const response = await authService.fetchWithAuth(`/api/products/${productId}/reviews`, {
+            method: "POST",
+            body: formData,
+        });
+        const result = await response.json();
+        if (result.success) {
+            toastManager.createToast({ message: result.message, type: "success" });
+            reviewForm.reset();
+            window.location.reload();
+        }
+        else {
+            toastManager.createToast({
+                message: result.message || "Gửi đánh giá thất bại.",
+                type: "error",
+            });
+        }
+    }
+    catch (error) {
+        console.error("Error submitting review:", error);
+        toastManager.createToast({
+            message: "Lỗi kết nối máy chủ.",
+            type: "error",
+        });
+    }
+    finally {
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.innerHTML = "Gửi đánh giá";
+        }
+    }
+});
