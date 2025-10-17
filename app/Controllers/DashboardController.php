@@ -4,6 +4,7 @@ namespace App\Controllers;
 use App\Core\View;
 use App\Helpers\Helpers;
 use App\Models\Category;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 
@@ -16,14 +17,31 @@ class DashboardController {
     }
   }
   public function index() {
+    $orderModel = new Order();
+    $userModel = new User();
+
+    $stats = [
+      'monthly_revenue' => $orderModel->getThisMonthRevenue(),
+      'new_orders_count' => $orderModel->getNewOrdersCount(),
+      'new_users_count' => $userModel->getNewUserCountThisMonth(),
+    ];
+
+    $recentOrders = $orderModel->getRecentOrders(5);
+
     View::render('pages/dashboard/index', [
-      'title' => 'Dashboard'
+      'title' => 'Dashboard',
+      'stats' => $stats,
+      'recentOrders' => $recentOrders
     ], 'layouts/dashboard');
   }
 
   public function orders() {
+    $orderModel = new Order();
+    $orders = $orderModel->getAllOrders();
+
     View::render('pages/dashboard/orders', [
-      'title' => 'Đơn hàng'
+      'title' => 'Đơn hàng',
+      'orders' => $orders
     ], 'layouts/dashboard');
   }
 
