@@ -219,4 +219,29 @@ class User {
     ];
     return $this->db->update('users', $data, "`id` = :id", ['id' => $userId]);
   }
+
+  public function updateAvatar(int $userId, string $imagePath) {
+    return $this->db->update('users', ['avatar_path' => $imagePath], 'id = :id', ['id' => $userId]);
+  }
+
+  public function updateProfile(int $userId, array $data) {
+    $allowedFields = ['full_name', 'phone_number', 'address'];
+    $updateData = [];
+    foreach ($allowedFields as $field) {
+      if (isset($data[$field])) {
+        $updateData[$field] = $data[$field] !== '' ? $data[$field] : null;
+      }
+    }
+
+    if (empty($updateData)) {
+      return false;
+    }
+
+    return $this->db->update('users', $updateData, 'id = :id', ['id' => $userId]);
+  }
+
+  public function changePassword(int $userId, string $newPassword) {
+    $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+    return $this->db->update('users', ['password' => $hashedPassword], 'id = :id', ['id' => $userId]);
+  }
 }

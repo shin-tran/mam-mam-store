@@ -30,6 +30,7 @@ $router = new Router();
 // Ai cũng vào được
 $router->get('/', PageController::class, 'home');
 $router->get('/product/{id}', PageController::class, 'productDetail');
+$router->get('/profile', PageController::class, 'profile', ['auth']);
 
 
 // Route chưa login (Guest)
@@ -92,6 +93,10 @@ $router->get('/api/orders/{id}', ApiOrderController::class, 'getDetails', [
 $router->post('/api/orders/update-status/{id}', ApiOrderController::class, 'updateStatus', [
   'sanitize', 'auth', 'admin'
 ]);
+
+$router->post('/api/profile/update', ApiUserController::class, 'updateProfile', ['auth', 'sanitize']);
+$router->post('/api/profile/avatar', ApiUserController::class, 'updateAvatar', ['auth']);
+$router->post('/api/profile/change-password', ApiUserController::class, 'changePassword', ['auth', 'sanitize']);
 
 // --- DISPATCH ROUTER ---
 $requestUri = $_SERVER['REQUEST_URI'];
