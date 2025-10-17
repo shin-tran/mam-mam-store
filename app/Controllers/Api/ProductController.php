@@ -4,6 +4,7 @@ namespace App\Controllers\Api;
 use App\Helpers\Helpers;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Review;
 use Exception;
 
 class ProductController {
@@ -143,6 +144,37 @@ class ProductController {
     }
   }
 
+  public function createReview($productId, $userData) {
+    if (!Helpers::isPost()) {
+      Helpers::sendJsonResponse(false, 'Phương thức không hợp lệ.', null, 405);
+    }
+
+    $userId = $userData->data->userId;
+    $rating = $_POST['rating'] ?? 0;
+    $comment = $_POST['comment'] ?? '';
+
+    // Validation
+    if ($rating < 1 || $rating > 5) {
+      Helpers::sendJsonResponse(false, 'Vui lòng chọn từ 1 đến 5 sao.', null, 422);
+    }
+    if (empty($comment)) {
+      Helpers::sendJsonResponse(false, 'Vui lòng nhập bình luận của bạn.', null, 422);
+    }
+
+    $reviewModel = new Review();
+    try {
+      $reviewId = $reviewModel->createReview($productId, $userId, $rating, $comment);
+      if ($reviewId) {
+        Helpers::sendJsonResponse(true, 'Cảm ơn bạn đã gửi đánh giá!', null, 201);
+      } else {
+        throw new Exception("Không thể tạo đánh giá.");
+      }
+    } catch (Exception $e) {
+      error_log("Review creation error: ".$e->getMessage());
+      Helpers::sendJsonResponse(false, 'Gửi đánh giá thất bại do lỗi hệ thống.', null, 500);
+    }
+  }
+
   private function validateProductData($post, $files, $isCreating = true) {
     $errors = [];
 
@@ -184,7 +216,6 @@ class ProductController {
 
     return $errors;
   }
-
 
   private function handleFileUpload($file) {
     $uploadDir = '/uploads/products/';

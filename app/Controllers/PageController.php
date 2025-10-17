@@ -6,6 +6,7 @@ use App\Helpers\Helpers;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Review;
 use App\Models\User;
 
 class PageController {
@@ -31,8 +32,10 @@ class PageController {
 
   public function productDetail($productId) {
     $productModel = new Product();
+    $reviewModel = new Review();
 
     $product = $productModel->getProduct($productId);
+    $reviews = $reviewModel->getReviewsByProductId($productId);
 
     if (!$product) {
       http_response_code(404);
@@ -42,7 +45,8 @@ class PageController {
 
     View::render('pages/product-details', [
       'title' => $product['product_name'] ?? 'Sản phẩm',
-      'product' => $product
+      'product' => $product,
+      'reviews' => $reviews
     ], 'layouts/main');
   }
 

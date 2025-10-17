@@ -16,7 +16,7 @@
   <link
     rel="icon"
     type="image/x-icon"
-    href="<?php echo _HOST_URL_PUBLIC ?>/favicon.ico"
+    href="<?php echo _HOST_URL_PUBLIC ?>/favicon.png"
   />
   <meta
     name="title"
