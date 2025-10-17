@@ -124,6 +124,16 @@ View::layout('head', ['title' => $title]);
           </a>
         </li>
         <li>
+          <a href="<?php echo _HOST_URL_DASHBOARD ?>/categories">
+            <img
+              src="<?php echo _HOST_URL_PUBLIC ?>/icons/shapes.svg"
+              alt="Categories icon"
+              class="size-5"
+            >
+            Danh mục
+          </a>
+        </li>
+        <li>
           <a href="<?php echo _HOST_URL_DASHBOARD ?>/products">
             <img
               src="<?php echo _HOST_URL_PUBLIC ?>/icons/package.svg"

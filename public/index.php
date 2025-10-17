@@ -1,6 +1,5 @@
 <?php
 
-use App\Controllers\Api\UserController;
 use App\Controllers\DashboardController;
 date_default_timezone_set("Asia/Ho_Chi_Minh");
 session_start();
@@ -17,7 +16,9 @@ use App\Core\Router;
 use App\Controllers\AuthController;
 use App\Controllers\PageController;
 use App\Controllers\Api\AuthController as ApiAuthController;
+use App\Controllers\Api\UserController as ApiUserController;
 use App\Controllers\Api\ProductController as ApiProductController;
+use App\Controllers\Api\CategoryController as ApiCategoryController;
 use App\Helpers\Helpers;
 
 Helpers::initializeUserSession();
@@ -43,6 +44,7 @@ $router->get('/orders', PageController::class, 'orders', ['auth']);
 $router->get('/dashboard', DashboardController::class, 'index', ['auth']);
 $router->get('/dashboard/orders', DashboardController::class, 'orders', ['auth']);
 $router->get('/dashboard/products', DashboardController::class, 'products', ['auth']);
+$router->get('/dashboard/categories', DashboardController::class, 'categories', ['auth']);
 $router->get('/dashboard/users', DashboardController::class, 'users', ['auth']);
 
 
@@ -64,13 +66,23 @@ $router->post('/api/reset-password', ApiAuthController::class, 'handleResetPassw
 $router->post('/api/products/create', ApiProductController::class, 'create', [
   'sanitize', 'auth', 'admin'
 ]);
-$router->post('/api/users/delete/{id}', UserController::class, 'delete', [
+$router->post('/api/users/delete/{id}', ApiUserController::class, 'delete', [
   'sanitize', 'auth', 'admin'
 ]);
-$router->post('/api/users/update/{id}', UserController::class, 'update', [
+$router->post('/api/users/update/{id}', ApiUserController::class, 'update', [
   'sanitize', 'auth', 'admin'
 ]);
 
+// Category API Routes
+$router->post('/api/categories/create', ApiCategoryController::class, 'create', [
+  'sanitize', 'auth', 'admin'
+]);
+$router->post('/api/categories/update/{id}', ApiCategoryController::class, 'update', [
+  'sanitize', 'auth', 'admin'
+]);
+$router->post('/api/categories/delete/{id}', ApiCategoryController::class, 'delete', [
+  'sanitize', 'auth', 'admin'
+]);
 
 // --- DISPATCH ROUTER ---
 $requestUri = $_SERVER['REQUEST_URI'];
@@ -81,3 +93,4 @@ $finalPath = Helpers::removePathFolder($requestPath);
 $router->dispatch($finalPath, $requestMethod);
 
 ob_end_flush(); // gửi (flush) toàn bộ ra trình duyệt và dọn dẹp bộ nhớ đệm
+

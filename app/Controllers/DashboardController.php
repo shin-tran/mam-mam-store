@@ -30,6 +30,7 @@ class DashboardController {
   public function products() {
     $productModel = new Product();
     $categoryModel = new Category();
+
     // lấy các thông tin và sẽ được sử dụng trong pages/dashboard/products
     $products = $productModel->getAllProducts();
     $categories = $categoryModel->getAll();
@@ -51,6 +52,17 @@ class DashboardController {
       'title' => 'Khách hàng',
       'users' => $users,
       'allRoles' => $allRoles
+    ], 'layouts/dashboard');
+  }
+
+  public function categories() {
+    $categoryModel = new Category();
+
+    $categories = $categoryModel->getAll();
+
+    View::render('pages/dashboard/categories', [
+      'title' => 'Danh mục',
+      'categories' => $categories
     ], 'layouts/dashboard');
   }
 }
