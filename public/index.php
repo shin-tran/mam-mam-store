@@ -66,7 +66,7 @@ $router->post('/api/reset-password', ApiAuthController::class, 'handleResetPassw
 $router->post('/api/users/update-details', UserController::class, 'updateDetails', ['auth', 'sanitize']);
 $router->post('/api/users/update-password', UserController::class, 'updatePassword', ['auth', 'sanitize']);
 $router->post('/api/users/update-avatar', UserController::class, 'updateAvatar', ['auth']);
-$router->post('/api/products-by-ids', ApiProductController::class, 'getByIds', ['auth']);
+$router->post('/api/products/cart', ApiProductController::class, 'getCartProducts', ['auth']);
 $router->post('/api/orders/create', ApiOrderController::class, 'create', ['auth', 'sanitize']);
 
 // Auth + Admin
