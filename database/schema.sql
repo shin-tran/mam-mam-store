@@ -86,7 +86,7 @@ CREATE TABLE
     `id` INT PRIMARY KEY AUTO_INCREMENT,
     `user_id` INT,
     `total_amount` DECIMAL(12, 2) NOT NULL,
-    `status` ENUM ('pending', 'shipping', 'completed', 'cancelled') DEFAULT 'pending',
+    `status` ENUM ('pending', 'packing', 'shipping', 'completed', 'cancelled') DEFAULT 'pending',
     `shipping_address` TEXT NOT NULL,
     `shipping_phone` VARCHAR(15) NOT NULL,
     `note` TEXT,

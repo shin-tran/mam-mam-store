@@ -244,4 +244,9 @@ class User {
     $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
     return $this->db->update('users', ['password' => $hashedPassword], 'id = :id', ['id' => $userId]);
   }
+
+  public function updateAvatarPath(int $userId, string $avatarPath) {
+    $data = ['avatar_path' => $avatarPath];
+    return $this->db->update('users', $data, 'id = :id', ['id' => $userId]);
+  }
 }

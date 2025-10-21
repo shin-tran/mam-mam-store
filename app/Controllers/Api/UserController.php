@@ -135,35 +135,111 @@ class UserController {
     }
   }
 
-  public function updateAvatar($userData) {
+  public function updateDetails($userData) {
     $userId = $userData->data->userId;
+    $postData = $_POST;
 
-    if (empty($_FILES['avatar'])) {
-      Helpers::sendJsonResponse(false, 'Vui lòng chọn một file ảnh.', null, 400);
+    $errors = [];
+    if (empty($postData['full_name'])) {
+      $errors['full_name'][] = 'Họ tên không được để trống.';
+    }
+    if (!empty($postData['phone_number']) && !Helpers::isPhone($postData['phone_number'])) {
+      $errors['phone_number'][] = 'Số điện thoại không hợp lệ.';
     }
 
+    // Check if phone number is already taken by another user
+    if (!empty($postData['phone_number'])) {
+      $userModel = new User();
+      $existingUser = $userModel->findUserByPhoneNumber($postData['phone_number']);
+      if ($existingUser && $existingUser['id'] != $userId) {
+        $errors['phone_number'][] = 'Số điện thoại đã được sử dụng.';
+      }
+    }
+
+    if (!empty($errors)) {
+      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', ['errors' => $errors], 422);
+    }
+
+    $userModel = new User();
+    $isUpdated = $userModel->updateProfile($userId, $postData);
+
+    if ($isUpdated) {
+      // Cập nhật session nếu cần
+      if (!empty($_SESSION['user'])) {
+        $_SESSION['user']['full_name'] = $postData['full_name'];
+        if (isset($postData['phone_number'])) {
+          $_SESSION['user']['phone_number'] = $postData['phone_number'];
+        }
+        if (isset($postData['address'])) {
+          $_SESSION['user']['address'] = $postData['address'];
+        }
+      }
+      Helpers::sendJsonResponse(true, 'Cập nhật thông tin thành công.');
+    } else {
+      Helpers::sendJsonResponse(false, 'Cập nhật thất bại hoặc không có gì thay đổi.', null, 400);
+    }
+  }
+
+  public function updateAvatar($userData) {
+    if (!isset($_FILES['avatar'])) {
+      Helpers::sendJsonResponse(false, 'Không có tệp nào được tải lên.', null, 400);
+    }
+
+    $userId = $userData->data->userId;
     $file = $_FILES['avatar'];
-    $allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-    if (!in_array($file['type'], $allowedTypes)) {
-      Helpers::sendJsonResponse(false, 'Chỉ chấp nhận file ảnh (JPEG, PNG, WEBP).', null, 415);
-    }
 
-    // Handle file upload
+    // --- Xử lý tải lên tệp ---
     $uploadDir = '/uploads/avatars/';
     $fullUploadDir = _PROJECT_ROOT.'/public'.$uploadDir;
+
     if (!is_dir($fullUploadDir)) {
       mkdir($fullUploadDir, 0777, true);
     }
-    $fileName = uniqid().'-'.basename($file['name']);
-    $targetPath = $fullUploadDir.$fileName;
 
-    if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-      $imagePath = $uploadDir.$fileName;
-      $userModel = new User();
-      $userModel->updateAvatar($userId, $imagePath);
-      Helpers::sendJsonResponse(true, 'Cập nhật ảnh đại diện thành công.', ['avatar_path' => $imagePath]);
+    $imageFileType = strtolower(pathinfo($file["name"], PATHINFO_EXTENSION));
+    $newFileName = uniqid('avatar_', true).'.'.$imageFileType;
+    $targetPath = $fullUploadDir.$newFileName;
+    $dbPath = $uploadDir.$newFileName;
+
+    // Kiểm tra file ảnh
+    $check = getimagesize($file["tmp_name"]);
+    if ($check === false) {
+      Helpers::sendJsonResponse(false, 'Tệp không phải là hình ảnh.', null, 400);
+    }
+
+    // Kiểm tra kích thước file
+    if ($file["size"] > 2000000) { // 2MB
+      Helpers::sendJsonResponse(false, 'Kích thước ảnh quá lớn (tối đa 2MB).', null, 400);
+    }
+
+    // Cho phép các định dạng nhất định
+    if (!in_array($imageFileType, ['jpg', 'png', 'jpeg', 'webp'])) {
+      Helpers::sendJsonResponse(false, 'Chỉ cho phép các định dạng JPG, JPEG, PNG & WEBP.', null, 400);
+    }
+
+    $userModel = new User();
+    $currentUser = $userModel->findUserById($userId);
+    $oldAvatarPath = $currentUser['avatar_path'] ?? null;
+
+    if (move_uploaded_file($file["tmp_name"], $targetPath)) {
+      // Cập nhật CSDL
+      if ($userModel->updateAvatarPath($userId, $dbPath)) {
+        // Xóa ảnh cũ nếu tồn tại
+        if ($oldAvatarPath && file_exists(_PROJECT_ROOT.'/public'.$oldAvatarPath)) {
+          unlink(_PROJECT_ROOT.'/public'.$oldAvatarPath);
+        }
+
+        // CẬP NHẬT SESSION
+        $_SESSION['user']['avatar_path'] = $dbPath;
+
+        Helpers::sendJsonResponse(true, 'Cập nhật ảnh đại diện thành công.', ['avatar_path' => $dbPath]);
+      } else {
+        // Xóa file mới tải lên nếu cập nhật DB thất bại
+        unlink($targetPath);
+        Helpers::sendJsonResponse(false, 'Lỗi khi cập nhật cơ sở dữ liệu.', null, 500);
+      }
     } else {
-      Helpers::sendJsonResponse(false, 'Tải ảnh lên thất bại.', null, 500);
+      Helpers::sendJsonResponse(false, 'Lỗi khi tải tệp lên.', null, 500);
     }
   }
 
@@ -185,6 +261,45 @@ class UserController {
 
     if (!empty($errors)) {
       Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', $errors, 422);
+    }
+
+    $userModel = new User();
+    $user = $userModel->findUserById($userId);
+
+    if (!$user || !password_verify($currentPassword, $user['password'])) {
+      Helpers::sendJsonResponse(false, 'Mật khẩu hiện tại không chính xác.', null, 401);
+    }
+
+    $isChanged = $userModel->changePassword($userId, $newPassword);
+    if ($isChanged) {
+      Helpers::sendJsonResponse(true, 'Đổi mật khẩu thành công.');
+    } else {
+      Helpers::sendJsonResponse(false, 'Đổi mật khẩu thất bại, vui lòng thử lại.', null, 500);
+    }
+  }
+
+  public function updatePassword($userData) {
+    $userId = $userData->data->userId;
+    $currentPassword = $_POST['current_password'] ?? '';
+    $newPassword = $_POST['new_password'] ?? '';
+    $confirmPassword = $_POST['confirm_password'] ?? '';
+
+    $errors = [];
+    if (empty($currentPassword)) {
+      $errors['current_password'][] = 'Mật khẩu hiện tại không được trống.';
+    }
+    if (empty($newPassword)) {
+      $errors['new_password'][] = 'Mật khẩu mới không được trống.';
+    }
+    if (strlen($newPassword) < 6) {
+      $errors['new_password'][] = 'Mật khẩu mới phải có ít nhất 6 ký tự.';
+    }
+    if ($newPassword !== $confirmPassword) {
+      $errors['confirm_password'][] = 'Mật khẩu xác nhận không khớp.';
+    }
+
+    if (!empty($errors)) {
+      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', ['errors' => $errors], 422);
     }
 
     $userModel = new User();

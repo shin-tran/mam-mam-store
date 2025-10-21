@@ -1,25 +1,26 @@
 <?php
 
+use App\Controllers\Api\UserController;
 use App\Controllers\DashboardController;
+use App\Controllers\Api\CategoryController;
+use App\Controllers\Api\OrderController as ApiOrderController;
+
 date_default_timezone_set("Asia/Ho_Chi_Minh");
 session_start();
 ob_start(); // lưu toàn bộ vào bộ nhớ đệm
 
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__.'/..');
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
 
-require_once __DIR__.'/../app/Configs/configs.php';
+require_once __DIR__ . '/../app/Configs/configs.php';
 
 use App\Core\Router;
 use App\Controllers\AuthController;
 use App\Controllers\PageController;
 use App\Controllers\Api\AuthController as ApiAuthController;
-use App\Controllers\Api\UserController as ApiUserController;
 use App\Controllers\Api\ProductController as ApiProductController;
-use App\Controllers\Api\CategoryController as ApiCategoryController;
-use App\Controllers\Api\OrderController as ApiOrderController;
 use App\Helpers\Helpers;
 
 Helpers::initializeUserSession();
@@ -29,53 +30,55 @@ $router = new Router();
 // --- WEB ROUTES ---
 $router->get('/', PageController::class, 'home');
 $router->get('/product/{id}', PageController::class, 'productDetail');
-$router->get('/profile', PageController::class, 'profile', ['auth']);
+
+// Guest
 $router->get('/activate', AuthController::class, 'showActivatePage', ['guest']);
 $router->get('/login', AuthController::class, 'showLoginPage', ['guest']);
 $router->get('/register', AuthController::class, 'showRegisterPage', ['guest']);
 $router->get('/forgot-password', AuthController::class, 'showForgotPasswordPage', ['guest']);
 $router->get('/reset-password', AuthController::class, 'showResetPasswordPage', ['guest']);
+
+// Auth
 $router->get('/orders', PageController::class, 'orders', ['auth']);
+$router->get('/profile', PageController::class, 'profile', ['auth']);
 $router->get('/dashboard', DashboardController::class, 'index', ['auth']);
 $router->get('/dashboard/orders', DashboardController::class, 'orders', ['auth']);
 $router->get('/dashboard/products', DashboardController::class, 'products', ['auth']);
-$router->get('/dashboard/categories', DashboardController::class, 'categories', ['auth']);
 $router->get('/dashboard/users', DashboardController::class, 'users', ['auth']);
+$router->get('/dashboard/categories', DashboardController::class, 'categories', ['auth']);
+
 
 // --- API ROUTES ---
-// Public APIs
+// Public
 $router->post('/api/check-email', ApiAuthController::class, 'checkEmail');
 $router->post('/api/check-phone-number', ApiAuthController::class, 'checkPhoneNumber');
 $router->post('/api/refresh-token', ApiAuthController::class, 'handleRefreshToken');
 $router->post('/api/logout', ApiAuthController::class, 'handleLogout');
 
-// Guest APIs
+// Guest
 $router->post('/api/activate', ApiAuthController::class, 'activateAccount', ['sanitize', 'guest']);
 $router->post('/api/register', ApiAuthController::class, 'handleRegister', ['sanitize', 'guest']);
 $router->post('/api/login', ApiAuthController::class, 'handleLogin', ['sanitize', 'guest']);
 $router->post('/api/forgot-password', ApiAuthController::class, 'handleForgotPassword', ['sanitize', 'guest']);
 $router->post('/api/reset-password', ApiAuthController::class, 'handleResetPassword', ['sanitize', 'guest']);
 
-// Authenticated User APIs
-$router->post('/api/products/cart', ApiProductController::class, 'getCartProducts', ['auth']);
+// Auth
+$router->post('/api/users/update-details', UserController::class, 'updateDetails', ['auth', 'sanitize']);
+$router->post('/api/users/update-password', UserController::class, 'updatePassword', ['auth', 'sanitize']);
+$router->post('/api/users/update-avatar', UserController::class, 'updateAvatar', ['auth']);
+$router->post('/api/products-by-ids', ApiProductController::class, 'getByIds', ['auth']);
 $router->post('/api/orders/create', ApiOrderController::class, 'create', ['auth', 'sanitize']);
-$router->get('/api/profile/info', ApiUserController::class, 'getProfileInfo', ['auth']);
-$router->post('/api/profile/update', ApiUserController::class, 'updateProfile', ['auth', 'sanitize']);
-$router->post('/api/profile/avatar', ApiUserController::class, 'updateAvatar', ['auth']);
-$router->post('/api/profile/change-password', ApiUserController::class, 'changePassword', ['auth', 'sanitize']);
 
-// Admin APIs
-$router->post('/api/products/create', ApiProductController::class, 'create', ['sanitize', 'auth', 'permission:admin']);
-$router->post('/api/products/update/{id}', ApiProductController::class, 'update', ['sanitize', 'auth', 'permission:admin']);
-$router->post('/api/products/{id}/reviews', ApiProductController::class, 'createReview', ['auth', 'sanitize']);
-$router->post('/api/products/delete/{id}', ApiProductController::class, 'delete', ['auth', 'permission:admin']);
-$router->post('/api/users/delete/{id}', ApiUserController::class, 'delete', ['sanitize', 'auth', 'permission:admin']);
-$router->post('/api/users/update/{id}', ApiUserController::class, 'update', ['sanitize', 'auth', 'permission:admin']);
-$router->post('/api/categories/create', ApiCategoryController::class, 'create', ['sanitize', 'auth', 'permission:admin']);
-$router->post('/api/categories/update/{id}', ApiCategoryController::class, 'update', ['sanitize', 'auth', 'permission:admin']);
-$router->post('/api/categories/delete/{id}', ApiCategoryController::class, 'delete', ['auth', 'permission:admin']);
-$router->get('/api/orders/{id}', ApiOrderController::class, 'getDetails', ['sanitize', 'auth', 'permission:admin']);
-$router->post('/api/orders/update-status/{id}', ApiOrderController::class, 'updateStatus', ['sanitize', 'auth', 'permission:admin']);
+// Auth + Admin
+$router->post('/api/products/create', ApiProductController::class, 'create', ['auth', 'admin', 'sanitize']);
+$router->post('/api/users/delete/{id}', UserController::class, 'delete', ['auth', 'admin']);
+$router->post('/api/users/update/{id}', UserController::class, 'update', ['auth', 'admin', 'sanitize']);
+$router->post('/api/categories/create', CategoryController::class, 'create', ['auth', 'admin', 'sanitize']);
+$router->post('/api/categories/update/{id}', CategoryController::class, 'update', ['auth', 'admin', 'sanitize']);
+$router->post('/api/categories/delete/{id}', CategoryController::class, 'delete', ['auth', 'admin']);
+$router->get('/api/orders/{id}', ApiOrderController::class, 'getDetails', ['auth', 'admin']);
+$router->post('/api/orders/update-status/{id}', ApiOrderController::class, 'updateStatus', ['auth', 'admin', 'sanitize']);
+
 
 // --- DISPATCH ROUTER ---
 $requestUri = $_SERVER['REQUEST_URI'];
@@ -85,5 +88,5 @@ $finalPath = Helpers::removePathFolder($requestPath);
 
 $router->dispatch($finalPath, $requestMethod);
 
-ob_end_flush(); // gửi (flush) toàn bộ ra trình duyệt và dọn dẹp bộ nhớ đệm
+ob_end_flush();
 

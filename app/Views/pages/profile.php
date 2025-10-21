@@ -5,26 +5,36 @@
       <!-- Avatar Card -->
       <div class="card bg-base-100 shadow-xl mb-6">
         <div class="card-body items-center text-center">
-          <div class="avatar relative group">
-            <div class="w-32 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-              <img
-                id="avatar-preview"
-                src="<?php echo $user['avatar_path'] ? _HOST_URL_PUBLIC.$user['avatar_path'] : 'https://placehold.co/128x128?text=Avatar'; ?>"
-              />
+          <form
+            id="avatar-form"
+            class="flex flex-col items-center"
+          >
+            <div class="avatar relative group">
+              <div class="w-32 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                <img
+                  id="avatar-preview"
+                  src="<?php echo $user['avatar_path'] ? _HOST_URL_PUBLIC.$user['avatar_path'] : 'https://placehold.co/128x128?text=Avatar'; ?>"
+                />
+              </div>
+              <label
+                for="avatar-input"
+                class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 cursor-pointer rounded-full transition-opacity"
+              >
+                Đổi ảnh
+              </label>
             </div>
-            <label
-              for="avatar-upload"
-              class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 cursor-pointer rounded-full transition-opacity"
-            >
-              Đổi ảnh
-            </label>
-          </div>
-          <input
-            type="file"
-            id="avatar-upload"
-            class="hidden"
-            accept="image/png, image/jpeg, image/webp"
-          />
+            <input
+              type="file"
+              id="avatar-input"
+              class="hidden"
+              accept="image/png, image/jpeg, image/webp"
+            />
+            <button
+              type="submit"
+              class="btn btn-primary mt-4 hidden"
+              id="avatar-submit-btn"
+            >Lưu ảnh</button>
+          </form>
           <h2 class="card-title mt-4"><?php echo htmlspecialchars($user['full_name']); ?></h2>
           <p><?php echo htmlspecialchars($user['email']); ?></p>
         </div>
@@ -47,7 +57,7 @@
           class="tab-content bg-base-100 border-base-300 rounded-box p-6"
         >
           <!-- Profile Info Form -->
-          <form id="profile-info-form">
+          <form id="details-form">
             <div class="space-y-4">
               <div class="form-control">
                 <label class="label"><span class="label-text">Họ và tên</span></label>
@@ -104,7 +114,7 @@
           class="tab-content bg-base-100 border-base-300 rounded-box p-6"
         >
           <!-- Change Password Form -->
-          <form id="change-password-form">
+          <form id="password-form">
             <div class="space-y-4">
               <div class="form-control">
                 <label class="label"><span class="label-text">Mật khẩu hiện tại</span></label>
@@ -173,6 +183,10 @@
                           case 'pending':
                             $status_text = 'Đang xử lý';
                             $badge_class = 'badge-warning';
+                            break;
+                          case 'packing':
+                            $status_text = 'Đang đóng gói';
+                            $badge_class = 'badge-info';
                             break;
                           case 'shipping':
                             $status_text = 'Đang giao';
