@@ -42,6 +42,7 @@ View::layout('head', ['title' => $title]);
               >
                 <div class="avatar w-10">
                   <img
+                    id="header-avatar-image"
                     alt="User avatar"
                     src="<?php
                     $split = explode(" ", $_SESSION['user']['full_name']);

@@ -72,7 +72,7 @@ View::layout('head', ['title' => $title]);
                 >
                   <div class="w-10 rounded-full">
                     <img
-                      id="nav-user-avatar"
+                      id="header-avatar-image"
                       alt="User avatar"
                       src="<?php echo $_SESSION['user']['avatar_path']
                         ? _HOST_URL_PUBLIC.$_SESSION['user']['avatar_path']

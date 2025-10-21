@@ -175,6 +175,20 @@ class ProductController {
     }
   }
 
+  public function getByIds() {
+    $json = file_get_contents('php://input');
+    $data = json_decode($json, true);
+
+    if (empty($data['ids']) || !is_array($data['ids'])) {
+      Helpers::sendJsonResponse(false, 'IDs sản phẩm không hợp lệ.', null, 400);
+    }
+
+    $productModel = new Product();
+    $products = $productModel->getProductsByIds($data['ids']);
+
+    Helpers::sendJsonResponse(true, 'Lấy thông tin sản phẩm thành công.', $products);
+  }
+
   private function validateProductData($post, $files, $isCreating = true) {
     $errors = [];
 
