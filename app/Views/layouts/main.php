@@ -143,10 +143,19 @@ View::layout('head', ['title' => $title]);
             <summary>
               Danh Mục Sản Phẩm
             </summary>
-            <ul class="bg-base-100 [&_li>*]:rounded-none p-0 shadow">
+            <ul class="join bg-base-100 [&_li>*]:rounded-none p-0 shadow flex flex-col">
+              <li><a
+                  class="btn join-item filter-btn active"
+                  data-category="all"
+                >
+                  Tất Cả
+                </a></li>
               <?php if (!empty($categories)): ?>
                 <?php foreach ($categories as $category): ?>
-                  <li><a><?php echo htmlspecialchars($category['category_name']); ?></a></li>
+                  <li><a
+                      class="btn join-item filter-btn"
+                      data-category="<?php echo htmlspecialchars($category['category_name']); ?>"
+                    ><?php echo htmlspecialchars($category['category_name']); ?></a></li>
                 <?php endforeach; ?>
               <?php else: ?>
                 <li><a>Không có danh mục</a></li>
