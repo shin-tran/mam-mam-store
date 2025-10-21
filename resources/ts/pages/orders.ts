@@ -151,6 +151,7 @@ function handleCartActions(event: Event) {
     });
   } else if (target.classList.contains("btn-remove")) {
     removeItem(productId);
+    Helpers.updateCartBadge();
   }
 }
 

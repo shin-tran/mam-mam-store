@@ -179,6 +179,7 @@ View::layout('head', ['title' => $title]);
 
   <script type="module">
     import { authService } from "<?php echo _HOST_URL_PUBLIC ?>/js/services/auth-service.js";
+    import { Helpers } from "<?php echo _HOST_URL_PUBLIC ?>/js/utils/helpers.js";
 
     const cartBadge = document.getElementById("cart-badge");
     const logoutBtn = document.getElementById("btn-logout");
@@ -188,18 +189,8 @@ View::layout('head', ['title' => $title]);
       localStorage.removeItem("cart");
     });
 
-    function updateCartBadge() {
-      if (!cartBadge) return;
-      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-      const totalItems = cart.reduce(
-        (sum, item) => sum + item.quantity,
-        0
-      );
-      cartBadge.textContent = totalItems.toString();
-    }
-
     document.addEventListener("DOMContentLoaded", () => {
-      updateCartBadge();
+      Helpers.updateCartBadge()
     });
   </script>
 </body>

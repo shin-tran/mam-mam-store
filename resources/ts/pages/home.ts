@@ -13,16 +13,6 @@ const cartBadge = document.getElementById("cart-badge");
 let activeCategory = "all";
 
 // === Cart Logic ===
-function updateCartBadge() {
-  if (!cartBadge) return;
-  const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-  const totalItems = cart.reduce(
-    (sum: number, item: any) => sum + item.quantity,
-    0
-  );
-  cartBadge.textContent = totalItems.toString();
-}
-
 function addToCart(
   productId: string,
   quantity: number,
@@ -61,7 +51,7 @@ function addToCart(
     }
 
     localStorage.setItem("cart", JSON.stringify(cart));
-    updateCartBadge();
+    Helpers.updateCartBadge();
     return true;
   } catch (error) {
     console.error("Error adding to cart:", error);
@@ -138,5 +128,5 @@ productGrid?.addEventListener("click", (event) => {
 
 // --- Initialization ---
 document.addEventListener("DOMContentLoaded", () => {
-  updateCartBadge();
+  Helpers.updateCartBadge();
 });
