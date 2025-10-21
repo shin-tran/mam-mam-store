@@ -31,7 +31,7 @@
       </div>
 
       <div class="flex flex-col md:flex-row justify-center items-center gap-4 mb-8">
-        <div class="join">
+        <div class="join hidden lg:block">
           <button
             class="btn join-item filter-btn active"
             data-category="all"
