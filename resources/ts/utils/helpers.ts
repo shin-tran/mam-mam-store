@@ -32,4 +32,17 @@ export class Helpers {
   static redirect(path: string = "") {
     window.location.href = `${AppConfig.BASE_URL}${path}`;
   }
+
+  static updateCartBadge() {
+    const cartBadge = document.getElementById("cart-badge");
+
+    if (!cartBadge) return;
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    const totalItems = cart.reduce(
+      (sum: number, item: any) => sum + item.quantity,
+      0
+    );
+
+    cartBadge.textContent = totalItems.toString();
+  }
 }

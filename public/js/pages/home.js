@@ -9,13 +9,6 @@ const productCards = document.querySelectorAll(".product-card");
 const cartBadge = document.getElementById("cart-badge");
 let activeCategory = "all";
 // === Cart Logic ===
-function updateCartBadge() {
-    if (!cartBadge)
-        return;
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    cartBadge.textContent = totalItems.toString();
-}
 function addToCart(productId, quantity, maxStock) {
     if (!authService.isLoggedIn()) {
         Helpers.redirect("/login");
@@ -42,7 +35,7 @@ function addToCart(productId, quantity, maxStock) {
             cart.push({ productId, quantity, addedAt: new Date().toISOString() });
         }
         localStorage.setItem("cart", JSON.stringify(cart));
-        updateCartBadge();
+        Helpers.updateCartBadge();
         return true;
     }
     catch (error) {
@@ -110,5 +103,5 @@ productGrid?.addEventListener("click", (event) => {
 });
 // --- Initialization ---
 document.addEventListener("DOMContentLoaded", () => {
-    updateCartBadge();
+    Helpers.updateCartBadge();
 });
