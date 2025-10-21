@@ -57,7 +57,7 @@ View::layout('head', ['title' => $title]);
                       <span
                         id="cart-badge"
                         class="badge badge-sm indicator-item"
-                      >0</span>
+                      ></span>
                     </div>
                   </div>
                 </a>
@@ -179,10 +179,27 @@ View::layout('head', ['title' => $title]);
 
   <script type="module">
     import { authService } from "<?php echo _HOST_URL_PUBLIC ?>/js/services/auth-service.js";
+
+    const cartBadge = document.getElementById("cart-badge");
     const logoutBtn = document.getElementById("btn-logout");
+
     logoutBtn?.addEventListener("click", async () => {
       await authService.logout();
       localStorage.removeItem("cart");
+    });
+
+    function updateCartBadge() {
+      if (!cartBadge) return;
+      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+      const totalItems = cart.reduce(
+        (sum, item) => sum + item.quantity,
+        0
+      );
+      cartBadge.textContent = totalItems.toString();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      updateCartBadge();
     });
   </script>
 </body>
