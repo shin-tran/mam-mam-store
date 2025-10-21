@@ -4,6 +4,7 @@ use App\Controllers\Api\UserController;
 use App\Controllers\DashboardController;
 use App\Controllers\Api\CategoryController;
 use App\Controllers\Api\OrderController as ApiOrderController;
+use App\Controllers\Api\UserController as ApiUserController;
 
 date_default_timezone_set("Asia/Ho_Chi_Minh");
 session_start();
@@ -46,6 +47,7 @@ $router->get('/dashboard/orders', DashboardController::class, 'orders', ['auth']
 $router->get('/dashboard/products', DashboardController::class, 'products', ['auth']);
 $router->get('/dashboard/users', DashboardController::class, 'users', ['auth']);
 $router->get('/dashboard/categories', DashboardController::class, 'categories', ['auth']);
+$router->get('/api/profile/info', ApiUserController::class, 'getProfileInfo', ['auth']);
 
 
 // --- API ROUTES ---
@@ -78,7 +80,6 @@ $router->post('/api/categories/update/{id}', CategoryController::class, 'update'
 $router->post('/api/categories/delete/{id}', CategoryController::class, 'delete', ['auth', 'admin']);
 $router->get('/api/orders/{id}', ApiOrderController::class, 'getDetails', ['auth', 'admin']);
 $router->post('/api/orders/update-status/{id}', ApiOrderController::class, 'updateStatus', ['auth', 'admin', 'sanitize']);
-
 
 // --- DISPATCH ROUTER ---
 $requestUri = $_SERVER['REQUEST_URI'];
