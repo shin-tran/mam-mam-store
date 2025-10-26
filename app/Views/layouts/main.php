@@ -126,6 +126,7 @@ View::layout('head', ['title' => $title]);
       </div>
       <?php
       echo $content;
+      View::layout('footer');
       ?>
     </div>
 

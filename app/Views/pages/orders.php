@@ -6,7 +6,7 @@
     class="py-16"
   >
     <div class="container mx-auto px-4 max-w-7xl">
-      <h1 class="text-3xl font-bold mb-6">Giỏ Hàng Của Bạn</h1>
+      <h1 class="text-3xl font-bold mb-6 ml-4">Giỏ Hàng Của Bạn</h1>
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div
           class="lg:col-span-2 space-y-4"
