@@ -34,6 +34,10 @@
                       <?php echo $order['status'] === 'pending' ? 'selected' : ''; ?>
                     >Đang xử lý</option>
                     <option
+                      value="packing"
+                      <?php echo $order['status'] === 'packing' ? 'selected' : ''; ?>
+                    >Đang đóng gói</option>
+                    <option
                       value="shipping"
                       <?php echo $order['status'] === 'shipping' ? 'selected' : ''; ?>
                     >Đang giao</option>

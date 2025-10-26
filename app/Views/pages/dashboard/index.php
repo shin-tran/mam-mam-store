@@ -51,6 +51,10 @@
                       $status_text = 'Đang xử lý';
                       $badge_class = 'badge-warning';
                       break;
+                    case 'packing':
+                      $status_text = 'Đang đóng gói';
+                      $badge_class = 'badge-info';
+                      break;
                     case 'shipping':
                       $status_text = 'Đang giao';
                       $badge_class = 'badge-info';

@@ -32,7 +32,7 @@ class Order {
   }
 
   public function updateStatus($orderId, $status) {
-    $allowed_statuses = ['pending', 'shipping', 'completed', 'cancelled'];
+    $allowed_statuses = ['pending', 'packing', 'shipping', 'completed', 'cancelled'];
     if (!in_array($status, $allowed_statuses)) {
       return false;
     }
