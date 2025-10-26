@@ -47,8 +47,6 @@ $router->get('/dashboard/orders', DashboardController::class, 'orders', ['auth']
 $router->get('/dashboard/products', DashboardController::class, 'products', ['auth']);
 $router->get('/dashboard/users', DashboardController::class, 'users', ['auth']);
 $router->get('/dashboard/categories', DashboardController::class, 'categories', ['auth']);
-$router->get('/api/profile/info', ApiUserController::class, 'getProfileInfo', ['auth']);
-
 
 // --- API ROUTES ---
 // Public
@@ -64,22 +62,32 @@ $router->post('/api/login', ApiAuthController::class, 'handleLogin', ['sanitize'
 $router->post('/api/forgot-password', ApiAuthController::class, 'handleForgotPassword', ['sanitize', 'guest']);
 $router->post('/api/reset-password', ApiAuthController::class, 'handleResetPassword', ['sanitize', 'guest']);
 
-// Auth
+// Profile
+$router->get('/api/profile/info', ApiUserController::class, 'getProfileInfo', ['auth']);
+
+// Users
 $router->post('/api/users/update-details', UserController::class, 'updateDetails', ['auth', 'sanitize']);
 $router->post('/api/users/update-password', UserController::class, 'updatePassword', ['auth', 'sanitize']);
 $router->post('/api/users/update-avatar', UserController::class, 'updateAvatar', ['auth']);
-$router->post('/api/products/cart', ApiProductController::class, 'getCartProducts', ['auth']);
-$router->post('/api/orders/create', ApiOrderController::class, 'create', ['auth', 'sanitize']);
-
-// Auth + Admin
-$router->post('/api/products/create', ApiProductController::class, 'create', ['auth', 'admin', 'sanitize']);
 $router->post('/api/users/delete/{id}', UserController::class, 'delete', ['auth', 'admin']);
 $router->post('/api/users/update/{id}', UserController::class, 'update', ['auth', 'admin', 'sanitize']);
+
+// Products
+$router->post('/api/products/cart', ApiProductController::class, 'getCartProducts', ['auth']);
+$router->post('/api/products/create', ApiProductController::class, 'create', ['auth', 'admin', 'sanitize']);
+$router->post('/api/products/delete/{id}', ApiProductController::class, 'delete', ['auth', 'admin']);
+$router->post('/api/products/update/{id}', ApiProductController::class, 'update', ['auth', 'admin', 'sanitize']);
+$router->post('/api/products/{id}/reviews', ApiProductController::class, 'createReview', ['auth', 'sanitize']);
+
+// Orders
+$router->post('/api/orders/create', ApiOrderController::class, 'create', ['auth', 'sanitize']);
+$router->get('/api/orders/{id}', ApiOrderController::class, 'getDetails', ['auth', 'admin']);
+$router->post('/api/orders/update-status/{id}', ApiOrderController::class, 'updateStatus', ['auth', 'admin', 'sanitize']);
+
+// Categories
 $router->post('/api/categories/create', CategoryController::class, 'create', ['auth', 'admin', 'sanitize']);
 $router->post('/api/categories/update/{id}', CategoryController::class, 'update', ['auth', 'admin', 'sanitize']);
 $router->post('/api/categories/delete/{id}', CategoryController::class, 'delete', ['auth', 'admin']);
-$router->get('/api/orders/{id}', ApiOrderController::class, 'getDetails', ['auth', 'admin']);
-$router->post('/api/orders/update-status/{id}', ApiOrderController::class, 'updateStatus', ['auth', 'admin', 'sanitize']);
 
 // --- DISPATCH ROUTER ---
 $requestUri = $_SERVER['REQUEST_URI'];

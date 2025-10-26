@@ -198,8 +198,8 @@ class UserController {
 
     $imageFileType = strtolower(pathinfo($file["name"], PATHINFO_EXTENSION));
     $newFileName = uniqid('avatar_', true).'.'.$imageFileType;
-    $targetPath = $fullUploadDir.$newFileName;
-    $dbPath = $uploadDir.$newFileName;
+    $targetPath = "$fullUploadDir$newFileName";
+    $dbPath = "$uploadDir$newFileName";
 
     // Kiểm tra file ảnh
     $check = getimagesize($file["tmp_name"]);
