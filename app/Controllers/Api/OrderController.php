@@ -20,9 +20,50 @@ class OrderController {
 
   public function updateStatus($orderId) {
     $status = $_POST['status'] ?? '';
+    $cancellationReason = $_POST['cancellation_reason'] ?? null;
+    $cancelledBy = $_POST['cancelled_by'] ?? 'admin';
+
+    // Validation
+    if (empty($status)) {
+      Helpers::sendJsonResponse(false, 'Trạng thái không được để trống.', null, 422);
+      return;
+    }
+
+    // Validate status value
+    $validStatuses = ['pending', 'packing', 'shipping', 'completed', 'cancelled'];
+    if (!in_array($status, $validStatuses)) {
+      Helpers::sendJsonResponse(false, 'Trạng thái không hợp lệ.', null, 422);
+      return;
+    }
+
+    // If status is cancelled, require cancellation reason
+    if ($status === 'cancelled') {
+      if (empty($cancellationReason)) {
+        Helpers::sendJsonResponse(false, 'Vui lòng cung cấp lý do hủy đơn hàng.', null, 422);
+        return;
+      }
+
+      // Validate cancelled_by
+      $validCancelledBy = ['customer', 'admin', 'system'];
+      if (!in_array($cancelledBy, $validCancelledBy)) {
+        Helpers::sendJsonResponse(false, 'Người hủy đơn không hợp lệ.', null, 422);
+        return;
+      }
+    }
 
     $orderModel = new Order();
-    $isSuccess = $orderModel->updateStatus($orderId, $status);
+    $updateData = [
+      'status' => $status
+    ];
+
+    // Add cancellation info if status is cancelled
+    if ($status === 'cancelled') {
+      $updateData['cancellation_reason'] = $cancellationReason;
+      $updateData['cancelled_by'] = $cancelledBy;
+      $updateData['cancelled_at'] = date('Y-m-d H:i:s');
+    }
+
+    $isSuccess = $orderModel->updateStatus($orderId, $updateData);
 
     if ($isSuccess) {
       Helpers::sendJsonResponse(true, 'Cập nhật trạng thái đơn hàng thành công.');
@@ -85,6 +126,8 @@ class OrderController {
         $totalAmount += $product['price'] * $quantity;
         $validatedCartItems[] = [
           'id' => $product['id'],
+          'product_name' => $product['product_name'],
+          'image_path' => $product['image_path'],
           'quantity' => $quantity,
           'price' => $product['price'],
           'stock_quantity' => $product['stock_quantity']
@@ -103,6 +146,59 @@ class OrderController {
     } catch (Exception $e) {
       error_log("Order creation error: ".$e->getMessage());
       Helpers::sendJsonResponse(false, $e->getMessage(), null, 500);
+    }
+  }
+
+  /**
+   * Hủy đơn hàng (dành cho khách hàng)
+   */
+  public function cancel($orderId, $userData) {
+    $userId = $userData->data->userId;
+    $json = file_get_contents('php://input'); // Đọc dữ liệu JSON gửi từ client (JavaScript)
+    $data = json_decode($json, true); // Chuyển chuỗi JSON thành mảng PHP
+
+    $cancellationReason = $data['cancellation_reason'] ?? '';
+
+    if (empty($cancellationReason)) {
+      Helpers::sendJsonResponse(false, 'Vui lòng cung cấp lý do hủy đơn hàng.', null, 422);
+      return;
+    }
+
+    $orderModel = new Order();
+
+    // Verify order belongs to user
+    $order = $orderModel->getOrderById($orderId);
+    if (!$order) {
+      Helpers::sendJsonResponse(false, 'Đơn hàng không tồn tại.', null, 404);
+      return;
+    }
+
+    if ($order['user_id'] != $userId) {
+      Helpers::sendJsonResponse(false, 'Bạn không có quyền hủy đơn hàng này.', null, 403);
+      return;
+    }
+
+    // Only allow cancellation for pending orders
+    if ($order['status'] !== 'pending') {
+      Helpers::sendJsonResponse(false, 'Chỉ có thể hủy đơn hàng đang chờ xử lý.', null, 400);
+      return;
+    }
+
+    $updateData = [
+      'status' => 'cancelled',
+      'cancellation_reason' => $cancellationReason,
+      'cancelled_by' => 'customer',
+      'cancelled_at' => date('Y-m-d H:i:s')
+    ];
+
+    $isSuccess = $orderModel->updateStatus($orderId, $updateData);
+
+    if ($isSuccess) {
+      // Restore product stock
+      $orderModel->restoreProductStock($orderId);
+      Helpers::sendJsonResponse(true, 'Hủy đơn hàng thành công.');
+    } else {
+      Helpers::sendJsonResponse(false, 'Không thể hủy đơn hàng.', null, 500);
     }
   }
 }

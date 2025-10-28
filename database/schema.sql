@@ -86,13 +86,24 @@ CREATE TABLE
     `id` INT PRIMARY KEY AUTO_INCREMENT,
     `user_id` INT,
     `total_amount` DECIMAL(12, 2) NOT NULL,
-    `status` ENUM ('pending', 'packing', 'shipping', 'completed', 'cancelled') DEFAULT 'pending',
+    `status` ENUM (
+      'pending',
+      'packing',
+      'shipping',
+      'completed',
+      'cancelled'
+    ) DEFAULT 'pending',
     `shipping_address` TEXT NOT NULL,
     `shipping_phone` VARCHAR(15) NOT NULL,
     `note` TEXT,
+    `cancellation_reason` TEXT NULL,
+    `cancelled_by` ENUM ('customer', 'admin', 'system') NULL,
+    `cancelled_at` TIMESTAMP NULL,
     `order_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-    INDEX `idx_user_id` (`user_id`)
+    INDEX `idx_user_id` (`user_id`),
+    INDEX `idx_status` (`status`)
   );
 
 CREATE TABLE
@@ -100,6 +111,8 @@ CREATE TABLE
     `id` INT PRIMARY KEY AUTO_INCREMENT,
     `order_id` INT,
     `product_id` INT,
+    `product_name` VARCHAR(255) NOT NULL DEFAULT 'Unknown Product',
+    `product_image_path` VARCHAR(255),
     `quantity` INT NOT NULL,
     `price_at_purchase` DECIMAL(10, 2) NOT NULL,
     FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,

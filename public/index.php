@@ -10,12 +10,12 @@ date_default_timezone_set("Asia/Ho_Chi_Minh");
 session_start();
 ob_start(); // lưu toàn bộ vào bộ nhớ đệm
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__.'/../vendor/autoload.php';
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__.'/..');
 $dotenv->load();
 
-require_once __DIR__ . '/../app/Configs/configs.php';
+require_once __DIR__.'/../app/Configs/configs.php';
 
 use App\Core\Router;
 use App\Controllers\AuthController;
@@ -83,6 +83,7 @@ $router->post('/api/products/{id}/reviews', ApiProductController::class, 'create
 $router->post('/api/orders/create', ApiOrderController::class, 'create', ['auth', 'sanitize']);
 $router->get('/api/orders/{id}', ApiOrderController::class, 'getDetails', ['auth', 'admin']);
 $router->post('/api/orders/update-status/{id}', ApiOrderController::class, 'updateStatus', ['auth', 'admin', 'sanitize']);
+$router->post('/api/orders/{id}/cancel', ApiOrderController::class, 'cancel', ['auth', 'sanitize']);
 
 // Categories
 $router->post('/api/categories/create', CategoryController::class, 'create', ['auth', 'admin', 'sanitize']);

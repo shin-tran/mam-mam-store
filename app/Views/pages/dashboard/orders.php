@@ -24,10 +24,11 @@
                 <td><?php echo htmlspecialchars($order['customer_name']); ?></td>
                 <td><?php echo date('d/m/Y H:i', strtotime($order['order_date'])); ?></td>
                 <td><?php echo number_format($order['total_amount'], 0, ',', '.'); ?> ₫</td>
-                <td>
+                <td class="flex items-center gap-2">
                   <select
                     class="select select-bordered select-sm status-select"
                     data-order-id="<?php echo $order['id']; ?>"
+                    data-current-status="<?php echo $order['status']; ?>"
                   >
                     <option
                       value="pending"
@@ -50,6 +51,28 @@
                       <?php echo $order['status'] === 'cancelled' ? 'selected' : ''; ?>
                     >Đã hủy</option>
                   </select>
+                  <?php if ($order['status'] === 'cancelled' && !empty($order['cancellation_reason'])): ?>
+                    <div
+                      class="tooltip tooltip-left"
+                      data-tip="<?php echo htmlspecialchars($order['cancellation_reason']); ?>"
+                    >
+                    <!-- INFO icon -->
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4 inline-block ml-1 cursor-help text-error"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </div>
+                  <?php endif; ?>
                 </td>
                 <td>
                   <button
@@ -74,6 +97,67 @@
     </div>
   </div>
 </div>
+
+<!-- Cancel Order Modal -->
+<dialog
+  id="cancel_order_modal"
+  class="modal"
+>
+  <div class="modal-box">
+    <h3 class="font-bold text-lg mb-4">Hủy đơn hàng</h3>
+    <form id="cancel-order-form">
+      <input
+        type="hidden"
+        id="cancel-order-id"
+        name="order_id"
+      />
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Lý do hủy đơn hàng <span class="text-error">*</span></span>
+        </label>
+        <select
+          name="cancellation_reason"
+          id="cancellation-reason-select"
+          class="select select-bordered mb-2"
+        >
+          <option value="">Chọn lý do</option>
+          <option value="Khách hàng yêu cầu hủy">Khách hàng yêu cầu hủy</option>
+          <option value="Sản phẩm hết hàng">Sản phẩm hết hàng</option>
+          <option value="Không liên hệ được khách hàng">Không liên hệ được khách hàng</option>
+          <option value="Địa chỉ giao hàng không hợp lệ">Địa chỉ giao hàng không hợp lệ</option>
+          <option value="Đơn hàng trùng lặp">Đơn hàng trùng lặp</option>
+          <option value="Khác">Khác (nhập chi tiết bên dưới)</option>
+        </select>
+        <textarea
+          name="cancellation_reason_text"
+          id="cancellation-reason-text"
+          class="textarea textarea-bordered h-24"
+          placeholder="Nhập lý do chi tiết (nếu chọn 'Khác' hoặc muốn bổ sung thông tin)..."
+        ></textarea>
+        <label class="label">
+          <span class="label-text-alt text-gray-500">Lý do hủy sẽ được gửi cho khách hàng</span>
+        </label>
+      </div>
+      <div class="modal-action">
+        <button
+          type="button"
+          class="btn"
+          onclick="cancel_order_modal.close()"
+        >Đóng</button>
+        <button
+          type="submit"
+          class="btn btn-error"
+        >Xác nhận hủy</button>
+      </div>
+    </form>
+  </div>
+  <form
+    method="dialog"
+    class="modal-backdrop"
+  >
+    <button>close</button>
+  </form>
+</dialog>
 
 <!-- Order Details Modal -->
 <dialog
