@@ -152,7 +152,7 @@ CREATE TABLE
   `payments` (
     `id` INT PRIMARY KEY AUTO_INCREMENT,
     `order_id` INT NOT NULL,
-    `payment_method` VARCHAR(30) NOT NULL COMMENT 'VD: COD, VNPAY, Momo, Bank Transfer',
+    `payment_method` VARCHAR(30) NOT NULL,
     `payment_status` ENUM('pending', 'completed', 'failed', 'refunded') NOT NULL DEFAULT 'pending',
     `amount` DECIMAL(12, 2) NOT NULL,
     `transaction_id` VARCHAR(255) NULL,
