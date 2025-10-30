@@ -21,7 +21,6 @@ CREATE TABLE
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY `uq_email` (`email`),
-    UNIQUE KEY `uq_phone_number` (`phone_number`),
     UNIQUE KEY `uq_email_verification_token` (`email_verification_token`),
     UNIQUE KEY `uq_forgot_password_token` (`forgot_password_token`)
   );
