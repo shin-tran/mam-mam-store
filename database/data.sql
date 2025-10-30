@@ -1,7 +1,3 @@
-INSERT INTO `roles` (`name`, `description`) VALUES
-('admin', 'Người quản trị cao nhất, có toàn quyền hệ thống.'),
-('customer', 'Khách hàng.');
-
 -- Xóa dữ liệu cũ trong bảng products và categories để tránh trùng lặp
 DELETE FROM `products`;
 DELETE FROM `categories`;
@@ -9,6 +5,10 @@ DELETE FROM `categories`;
 -- Reset auto-increment cho bảng categories và products
 ALTER TABLE `categories` AUTO_INCREMENT = 1;
 ALTER TABLE `products` AUTO_INCREMENT = 1;
+
+INSERT INTO `roles` (`name`, `description`) VALUES
+('admin', 'Người quản trị cao nhất, có toàn quyền hệ thống.'),
+('customer', 'Khách hàng.');
 
 -- Thêm các danh mục sản phẩm
 INSERT INTO `categories` (`category_name`) VALUES
@@ -51,6 +51,31 @@ INSERT INTO `products` (`product_name`, `price`, `stock_quantity`, `description`
 ('Trà Ô Long Tea+ Plus', 12000, 150, 'Trà ô long nguyên chất giúp giảm hấp thụ chất béo, cho cảm giác nhẹ nhàng.', 5, '/uploads/products/placeholder.png'),
 ('Sữa Chua Uống Yakult', 25000, 80, 'Lốc 5 chai sữa chua uống lên men tự nhiên, tốt cho hệ tiêu hóa.', 5, '/uploads/products/placeholder.png'),
 ('Nước Suối Aquafina', 6000, 250, 'Nước tinh khiết, mát lành, giúp bạn bù nước và thanh lọc cơ thể.', 5, '/uploads/products/placeholder.png');
+
+-- Thêm một số khu vực phục vụ mẫu (Ví dụ: TP.HCM)
+INSERT INTO
+  `serviceable_locations` (`city`, `district`)
+VALUES
+  ('Hồ Chí Minh', 'Quận 1'),
+  ('Hồ Chí Minh', 'Quận 3'),
+  ('Hồ Chí Minh', 'Quận 10'),
+  ('Hồ Chí Minh', 'Quận Gò Vấp'),
+  ('Hồ Chí Minh', 'Quận Bình Thạnh');
+
+-- Thêm một số cấu hình mặc định
+INSERT INTO
+  `shipping_config` (`config_key`, `config_value`, `description`)
+VALUES
+  (
+    'FREE_SHIPPING_THRESHOLD',
+    '300000',
+    'Ngưỡng miễn phí vận chuyển (VND). Đặt 0 nếu không miễn phí.'
+  ),
+  (
+    'STANDARD_SHIPPING_FEE',
+    '25000',
+    'Phí vận chuyển tiêu chuẩn (VND) nếu không đủ điều kiện miễn phí.'
+  );
 
 -- NOTE: TEST DATA DO NOT RUN THIS
 INSERT INTO `role_user` (`user_id`, `role_id`) VALUES (1, 1);

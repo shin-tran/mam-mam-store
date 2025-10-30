@@ -10,9 +10,7 @@ CREATE TABLE
     `id` INT PRIMARY KEY AUTO_INCREMENT,
     `full_name` VARCHAR(255) NOT NULL,
     `email` VARCHAR(255) NOT NULL,
-    `phone_number` VARCHAR(15),
     `password` VARCHAR(255) NOT NULL,
-    `address` TEXT,
     `avatar_path` VARCHAR(255),
     `email_verification_token` VARCHAR(255),
     `verification_expires_at` DATETIME NULL,
@@ -59,6 +57,23 @@ CREATE TABLE
   );
 
 CREATE TABLE
+  `user_addresses` (
+    `id` INT PRIMARY KEY AUTO_INCREMENT,
+    `user_id` INT NOT NULL,
+    `recipient_name` VARCHAR(255) NOT NULL,
+    `phone_number` VARCHAR(15) NOT NULL,
+    `street_address` VARCHAR(255) NOT NULL,
+    `ward` VARCHAR(100) NOT NULL,
+    `district` VARCHAR(100) NOT NULL,
+    `city` VARCHAR(100) NOT NULL,
+    `is_default` BOOLEAN NOT NULL DEFAULT 0,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+    INDEX `idx_user_id` (`user_id`)
+  );
+
+CREATE TABLE
   `categories` (
     `id` INT PRIMARY KEY AUTO_INCREMENT,
     `category_name` VARCHAR(255) NOT NULL,
@@ -72,6 +87,7 @@ CREATE TABLE
     `product_name` VARCHAR(255) NOT NULL,
     `price` DECIMAL(10, 2) NOT NULL,
     `stock_quantity` INT NOT NULL DEFAULT 0,
+    `inventory_type` ENUM('in_stock', 'made_to_order') NOT NULL DEFAULT 'in_stock',
     `category_id` INT,
     `description` TEXT,
     `image_path` VARCHAR(255) NOT NULL,
@@ -85,6 +101,8 @@ CREATE TABLE
   `orders` (
     `id` INT PRIMARY KEY AUTO_INCREMENT,
     `user_id` INT,
+    `subtotal` DECIMAL(12, 2) NOT NULL,
+    `shipping_fee` DECIMAL(10, 2) NOT NULL DEFAULT 0,
     `total_amount` DECIMAL(12, 2) NOT NULL,
     `status` ENUM (
       'pending',
@@ -129,4 +147,37 @@ CREATE TABLE
     `review_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+  );
+
+CREATE TABLE
+  `payments` (
+    `id` INT PRIMARY KEY AUTO_INCREMENT,
+    `order_id` INT NOT NULL,
+    `payment_method` VARCHAR(30) NOT NULL COMMENT 'VD: COD, VNPAY, Momo, Bank Transfer',
+    `payment_status` ENUM('pending', 'completed', 'failed', 'refunded') NOT NULL DEFAULT 'pending',
+    `amount` DECIMAL(12, 2) NOT NULL,
+    `transaction_id` VARCHAR(255) NULL,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
+    INDEX `idx_order_id` (`order_id`),
+    INDEX `idx_payment_status` (`payment_status`)
+  );
+
+CREATE TABLE
+  `serviceable_locations` (
+    `id` INT PRIMARY KEY AUTO_INCREMENT,
+    `city` VARCHAR(100) NOT NULL,
+    `district` VARCHAR(100) NOT NULL,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY `uq_city_district` (`city`, `district`)
+  );
+
+CREATE TABLE
+  `shipping_config` (
+    `id` INT PRIMARY KEY AUTO_INCREMENT,
+    `config_key` VARCHAR(100) NOT NULL UNIQUE,
+    `config_value` VARCHAR(255) NOT NULL,
+    `description` TEXT NULL,
+    `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   );
