@@ -2,6 +2,7 @@
 namespace App\Controllers\Api;
 
 use App\Helpers\Helpers;
+use App\Helpers\Validator;
 use App\Models\User;
 use Exception;
 
@@ -43,24 +44,12 @@ class UserController {
       Helpers::sendJsonResponse(false, 'Người dùng không tồn tại.', null, 404);
     }
 
-    // Server-side validation
-    $errors = [];
-    if (empty($_POST['full_name'])) {
-      $errors['full_name'][] = 'Họ tên không được để trống.';
-    }
-    if (!empty($_POST['phone_number']) && !Helpers::isPhone($_POST['phone_number'])) {
-      $errors['phone_number'][] = 'Số điện thoại không hợp lệ.';
-    }
-    // Check if phone number is already taken by another user
-    if (!empty($_POST['phone_number'])) {
-      $existingUser = $userModel->findUserByPhoneNumber($_POST['phone_number']);
-      if ($existingUser && $existingUser['id'] != $idToUpdate) {
-        $errors['phone_number'][] = 'Số điện thoại đã được sử dụng.';
-      }
-    }
+    $validator = Validator::make($_POST);
+    $validator->required('full_name', 'Họ tên không được để trống.')
+      ->phone('phone_number');
 
-    if (!empty($errors)) {
-      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', ['errors' => $errors], 422);
+    if ($validator->fails()) {
+      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', $validator->getErrors(), 422);
     }
 
     try {
@@ -111,22 +100,17 @@ class UserController {
 
   public function updateProfile($userData) {
     $userId = $userData->data->userId;
-    $postData = $_POST;
 
-    $errors = [];
-    if (empty($postData['full_name'])) {
-      $errors['full_name'][] = 'Họ tên không được để trống.';
-    }
-    if (!empty($postData['phone_number']) && !Helpers::isPhone($postData['phone_number'])) {
-      $errors['phone_number'][] = 'Số điện thoại không hợp lệ.';
-    }
+    $validator = Validator::make($_POST);
+    $validator->required('full_name', 'Họ tên không được để trống.')
+      ->phone('phone_number');
 
-    if (!empty($errors)) {
-      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', ['errors' => $errors], 422);
+    if ($validator->fails()) {
+      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', $validator->getErrors(), 422);
     }
 
     $userModel = new User();
-    $isUpdated = $userModel->updateProfile($userId, $postData);
+    $isUpdated = $userModel->updateProfile($userId, $_POST);
 
     if ($isUpdated) {
       Helpers::sendJsonResponse(true, 'Cập nhật thông tin thành công.');
@@ -139,25 +123,12 @@ class UserController {
     $userId = $userData->data->userId;
     $postData = $_POST;
 
-    $errors = [];
-    if (empty($postData['full_name'])) {
-      $errors['full_name'][] = 'Họ tên không được để trống.';
-    }
-    if (!empty($postData['phone_number']) && !Helpers::isPhone($postData['phone_number'])) {
-      $errors['phone_number'][] = 'Số điện thoại không hợp lệ.';
-    }
+    $validator = Validator::make($_POST);
+    $validator->required('full_name', 'Họ tên không được để trống.')
+      ->phone('phone_number');
 
-    // Check if phone number is already taken by another user
-    if (!empty($postData['phone_number'])) {
-      $userModel = new User();
-      $existingUser = $userModel->findUserByPhoneNumber($postData['phone_number']);
-      if ($existingUser && $existingUser['id'] != $userId) {
-        $errors['phone_number'][] = 'Số điện thoại đã được sử dụng.';
-      }
-    }
-
-    if (!empty($errors)) {
-      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', ['errors' => $errors], 422);
+    if ($validator->fails()) {
+      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', $validator->getErrors(), 422);
     }
 
     $userModel = new User();
@@ -245,32 +216,25 @@ class UserController {
 
   public function changePassword($userData) {
     $userId = $userData->data->userId;
-    $currentPassword = $_POST['current_password'];
-    $newPassword = $_POST['new_password'];
-    $confirmPassword = $_POST['confirm_password'];
 
-    $errors = [];
-    if (empty($currentPassword))
-      $errors['current_password'][] = 'Mật khẩu hiện tại không được trống.';
-    if (empty($newPassword))
-      $errors['new_password'][] = 'Mật khẩu mới không được trống.';
-    if (strlen($newPassword) < 6)
-      $errors['new_password'][] = 'Mật khẩu mới phải có ít nhất 6 ký tự.';
-    if ($newPassword !== $confirmPassword)
-      $errors['confirm_password'][] = 'Mật khẩu xác nhận không khớp.';
+    $validator = Validator::make($_POST);
+    $validator->required('current_password', 'Mật khẩu hiện tại không được trống.')
+    ->required('new_password', 'Mật khẩu mới không được trống.')
+    ->minLength('new_password', 6, 'Mật khẩu mới phải có ít nhất 6 ký tự.')
+    ->matches($_POST['new_password'], $_POST['confirm_password'], 'Mật khẩu xác nhận không khớp.');
 
-    if (!empty($errors)) {
-      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', $errors, 422);
+    if ($validator->fails()) {
+      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', $validator->getErrors(), 422);
     }
 
     $userModel = new User();
     $user = $userModel->findUserById($userId);
 
-    if (!$user || !password_verify($currentPassword, $user['password'])) {
+    if (!$user || !password_verify($_POST['current_password'], $user['password'])) {
       Helpers::sendJsonResponse(false, 'Mật khẩu hiện tại không chính xác.', null, 401);
     }
 
-    $isChanged = $userModel->changePassword($userId, $newPassword);
+    $isChanged = $userModel->changePassword($userId, $_POST['new_password']);
     if ($isChanged) {
       Helpers::sendJsonResponse(true, 'Đổi mật khẩu thành công.');
     } else {
@@ -280,36 +244,25 @@ class UserController {
 
   public function updatePassword($userData) {
     $userId = $userData->data->userId;
-    $currentPassword = $_POST['current_password'] ?? '';
-    $newPassword = $_POST['new_password'] ?? '';
-    $confirmPassword = $_POST['confirm_password'] ?? '';
 
-    $errors = [];
-    if (empty($currentPassword)) {
-      $errors['current_password'][] = 'Mật khẩu hiện tại không được trống.';
-    }
-    if (empty($newPassword)) {
-      $errors['new_password'][] = 'Mật khẩu mới không được trống.';
-    }
-    if (strlen($newPassword) < 6) {
-      $errors['new_password'][] = 'Mật khẩu mới phải có ít nhất 6 ký tự.';
-    }
-    if ($newPassword !== $confirmPassword) {
-      $errors['confirm_password'][] = 'Mật khẩu xác nhận không khớp.';
-    }
+    $validator = Validator::make($_POST);
+    $validator->required('current_password', 'Mật khẩu hiện tại không được trống.')
+    ->required('new_password', 'Mật khẩu mới không được trống.')
+    ->minLength('new_password', 6, 'Mật khẩu mới phải có ít nhất 6 ký tự.')
+    ->matches($_POST['new_password'], $_POST['confirm_password'], 'Mật khẩu xác nhận không khớp.');
 
-    if (!empty($errors)) {
-      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', ['errors' => $errors], 422);
+    if ($validator->fails()) {
+      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', $validator->getErrors(), 422);
     }
 
     $userModel = new User();
     $user = $userModel->findUserById($userId);
 
-    if (!$user || !password_verify($currentPassword, $user['password'])) {
+    if (!$user || !password_verify($_POST['current_password'], $user['password'])) {
       Helpers::sendJsonResponse(false, 'Mật khẩu hiện tại không chính xác.', null, 401);
     }
 
-    $isChanged = $userModel->changePassword($userId, $newPassword);
+    $isChanged = $userModel->changePassword($userId, $_POST['new_password']);
     if ($isChanged) {
       Helpers::sendJsonResponse(true, 'Đổi mật khẩu thành công.');
     } else {
