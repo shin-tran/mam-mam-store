@@ -33,7 +33,12 @@ class Order {
   }
 
   public function updateStatus($orderId, $updateData) {
-    return $this->db->update('orders', $updateData, '`id` = :id', ['id' => $orderId]);
+    return $this->db->update(
+      'orders',
+      $updateData,
+      '`id` = :id',
+      ['id' => $orderId]
+    );
   }
 
   public function createOrder(int $userId, array $cartItems, array $shippingInfo, float $totalAmount) {
@@ -71,7 +76,14 @@ class Order {
         $sql = "UPDATE `products`
                 SET `stock_quantity` = `stock_quantity` - ?
                 WHERE `id` = ? AND `stock_quantity` >= ?";
-        $updateSuccess = $this->db->query($sql, [$item['quantity'], $item['id'], $item['quantity']]);
+        $updateSuccess = $this->db->query(
+          $sql,
+          [
+            $item['quantity'],
+            $item['id'],
+            $item['quantity']
+          ]
+        );
 
         if ($updateSuccess->rowCount() == 0) {
           throw new Exception("Không đủ số lượng cho sản phẩm ID: ".$item['id']);
@@ -87,15 +99,14 @@ class Order {
     }
   }
 
-
   // --- Dashboard Methods ---
 
   public function getThisMonthRevenue() {
     $sql = "SELECT SUM(`total_amount`) as `total_revenue`
             FROM `orders`
-            WHERE status = 'completed'
-                  AND MONTH(`order_date`) = MONTH(CURRENT_DATE())
-                  AND YEAR(`order_date`) = YEAR(CURRENT_DATE())";
+            WHERE `status` = 'completed'
+            AND MONTH(`order_date`) = MONTH(CURRENT_DATE())
+            AND YEAR(`order_date`) = YEAR(CURRENT_DATE())";
     $result = $this->db->getOne($sql);
     return $result['total_revenue'] ?? 0;
   }
@@ -162,7 +173,10 @@ class Order {
         $updateSql = "UPDATE `products`
                       SET `stock_quantity` = `stock_quantity` + ?
                       WHERE `id` = ?";
-        $this->db->query($updateSql, [$detail['quantity'], $detail['product_id']]);
+        $this->db->query(
+          $updateSql,
+          [$detail['quantity'], $detail['product_id']]
+        );
       }
 
       return true;

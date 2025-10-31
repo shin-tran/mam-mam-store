@@ -11,11 +11,11 @@ class Review {
   }
 
   public function getReviewsByProductId(int $productId) {
-    $sql = "SELECT r.*, u.full_name, u.avatar_path
+    $sql = "SELECT r.*, u.`full_name`, u.`avatar_path`
             FROM `reviews` r
-            JOIN `users` u ON r.user_id = u.id
-            WHERE r.product_id = :product_id
-            ORDER BY r.review_date DESC";
+            JOIN `users` u ON r.`user_id` = u.`id`
+            WHERE r.`product_id` = :product_id
+            ORDER BY r.`review_date` DESC";
     return $this->db->getAll($sql, ['product_id' => $productId]);
   }
 

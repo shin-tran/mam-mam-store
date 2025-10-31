@@ -187,7 +187,7 @@ class Helpers {
       $userModel = new User();
       $user = $userModel->findUserById($tokenData['user_id']);
       if ($user) {
-        $role = array_column($userModel->getRoleUser($user['id']), 'name');
+        $role = array_column($userModel->findRoleUser($user['id']), 'name');
         // Khôi phục thông tin vào session
         $_SESSION['user'] = [
           'id' => $user['id'],

@@ -14,20 +14,20 @@ class Product {
   public function getAllProducts() {
     $sql = "SELECT
               p.*,
-              c.category_name
+              c.`category_name`
             FROM `products` p
-            LEFT JOIN `categories` c ON p.category_id = c.id
-            ORDER BY p.created_at DESC";
+            LEFT JOIN `categories` c ON p.`category_id` = c.`id`
+            ORDER BY p.`created_at` DESC";
     return $this->db->getAll($sql);
   }
 
   public function getProduct($productId) {
     $sql = "SELECT
               p.*,
-              c.category_name
+              c.`category_name`
             FROM `products` p
-            LEFT JOIN `categories` c ON p.category_id = c.id
-            WHERE p.id = :id";
+            LEFT JOIN `categories` c ON p.`category_id` = c.`id`
+            WHERE p.`id` = :id";
     return $this->db->getOne($sql, ['id' => $productId]);
   }
 
@@ -36,9 +36,9 @@ class Product {
       return [];
     }
     $placeholders = implode(',', array_fill(0, count($productIds), '?'));
-    $sql = "SELECT p.*, c.category_name
+    $sql = "SELECT p.*, c.`category_name`
               FROM `products` p
-              LEFT JOIN `categories` c ON p.category_id = c.id
+              LEFT JOIN `categories` c ON p.`category_id` = c.`id`
               WHERE p.id IN ($placeholders)";
     return $this->db->getAll($sql, $productIds);
   }
@@ -64,10 +64,19 @@ class Product {
       'description' => $postData['description'] ?? null,
       'image_path' => $imagePath,
     ];
-    return $this->db->update('products', $data, 'id = :id', ['id' => $id]);
+    return $this->db->update(
+      'products',
+      $data,
+      'id = :id',
+      ['id' => $id]
+    );
   }
 
   public function deleteProduct(int $id) {
-    return $this->db->delete('products', 'id = :id', ['id' => $id]);
+    return $this->db->delete(
+      'products',
+      'id = :id',
+      ['id' => $id]
+    );
   }
 }

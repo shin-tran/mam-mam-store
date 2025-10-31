@@ -135,7 +135,7 @@ class AuthController {
     $secretKey = $_ENV['ACCESS_TOKEN_SECRET'];
     $issuedAt = new DateTimeImmutable();
     $expire = $issuedAt->modify("+{$_ENV['ACCESS_TOKEN_LIFETIME']}")->getTimestamp();
-    $role = array_column($userModel->getRoleUser($user['id']), 'name');
+    $role = array_column($userModel->findRoleUser($user['id']), 'name');
 
     // Lưu thông tin người dùng vào Session
     $_SESSION['user'] = [
@@ -202,7 +202,7 @@ class AuthController {
       Helpers::sendJsonResponse(false, 'Token xác thực không được cung cấp.', null, 400);// 400 bad request
 
     $userModel = new User();
-    $user = $userModel->findUserByEmailVeriToken($_POST['token']);
+    $user = $userModel->findUserIdByEmailVeriToken($_POST['token']);
     if (!$user)
       Helpers::sendJsonResponse(false, 'Token kích hoạt không hợp lệ hoặc đã hết hạn.', null, 400);
 
@@ -266,7 +266,7 @@ class AuthController {
     }
 
     $userModel = new User();
-    $user = $userModel->findUserByForgotPasswordToken($_POST['token']);
+    $user = $userModel->findUserIdByForgotPasswordToken($_POST['token']);
     if (!$user) {
       Helpers::sendJsonResponse(false, 'Token đã hết hạn hoặc không chính xác.', null, 401); // 401 Unauthorized => lỗi xác thực
     }
@@ -311,7 +311,7 @@ class AuthController {
     $issuedAt = new DateTimeImmutable();
     $expire = $issuedAt->modify("+{$_ENV['ACCESS_TOKEN_LIFETIME']}")->getTimestamp();
 
-    $role = array_column($userModel->getRoleUser($user['id']), 'name');
+    $role = array_column($userModel->findRoleUser($user['id']), 'name');
 
     // Cập nhật lại session
     $_SESSION['user'] = [

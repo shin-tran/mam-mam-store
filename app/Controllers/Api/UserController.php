@@ -84,7 +84,7 @@ class UserController {
     }
 
     // Ngăn chặn việc xóa admin
-    $roleOfUserToDelete = $userModel->getRoleUser($idToDelete);
+    $roleOfUserToDelete = $userModel->findRoleUser($idToDelete);
     if (in_array('admin', array_column($roleOfUserToDelete, 'name'))) {
       Helpers::sendJsonResponse(false, 'Không thể xóa tài khoản admin.', null, 403);
     }

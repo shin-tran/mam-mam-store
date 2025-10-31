@@ -15,8 +15,9 @@ class User {
 
   public function getNewUserCountThisMonth() {
     $sql = "SELECT COUNT(`id`) as `new_users`
-                FROM `users`
-                WHERE MONTH(`created_at`) = MONTH(CURRENT_DATE()) AND YEAR(`created_at`) = YEAR(CURRENT_DATE())";
+            FROM `users`
+            WHERE MONTH(`created_at`) = MONTH(CURRENT_DATE())
+            AND YEAR(`created_at`) = YEAR(CURRENT_DATE())";
     $result = $this->db->getOne($sql);
     return $result['new_users'] ?? 0;
   }
@@ -26,7 +27,6 @@ class User {
               u.`id`,
               u.`full_name`,
               u.`email`,
-              u.`address`,
               u.`is_activated`,
               r.`name` as `role`
             FROM `users` u
@@ -41,7 +41,7 @@ class User {
     $this->db->beginTransaction();
     try {
       // 1. Cập nhật thông tin chi tiết người dùng
-      $allowedFields = ['full_name', 'address'];
+      $allowedFields = ['full_name'];
       $updateData = [];
       foreach ($allowedFields as $field) {
         if (isset($details[$field])) {
@@ -58,7 +58,13 @@ class User {
 
       // Thêm các vai trò mới
       if (!empty($roleId)) {
-        $this->db->insert('role_user', ['user_id' => $userId, 'role_id' => $roleId]);
+        $this->db->insert(
+          'role_user',
+          [
+            'user_id' => $userId,
+            'role_id' => $roleId
+          ]
+        );
       }
 
       $this->db->commit();
@@ -72,11 +78,18 @@ class User {
   }
 
   public function deleteUser(int $userId) {
-    return $this->db->delete('users', 'id = :id', ['id' => $userId]);
+    return $this->db->delete(
+      'users',
+      'id = :id',
+      ['id' => $userId]
+    );
   }
 
   public function emailExists(string $email) {
-    $count = $this->db->countRows("SELECT id FROM `users` WHERE `email` = ?", [$email]);
+    $count = $this->db->countRows(
+      "SELECT `id` FROM `users` WHERE `email` = ?",
+      [$email]
+    );
     return $count > 0;
   }
 
@@ -108,7 +121,7 @@ class User {
     return $this->db->getOne($sql, ['email' => $email]);
   }
 
-  public function findUserByEmailVeriToken(string $token) {
+  public function findUserIdByEmailVeriToken(string $token) {
     $sql = "SELECT `id` FROM `users`
             WHERE `email_verification_token` = :token
             AND `verification_expires_at` > NOW()
@@ -116,7 +129,7 @@ class User {
     return $this->db->getOne($sql, ['token' => $token]);
   }
 
-  public function findUserByForgotPasswordToken(string $token) {
+  public function findUserIdByForgotPasswordToken(string $token) {
     $sql = "SELECT `id` FROM `users`
             WHERE `forgot_password_token` = :token
             AND `forgot_password_expires_at` > NOW()";
@@ -137,7 +150,7 @@ class User {
     return $this->db->getAll($sql);
   }
 
-  public function getRoleUser(int $userId) {
+  public function findRoleUser(int $userId) {
     $sql = "SELECT `name` FROM `role_user`
             INNER JOIN `roles` ON `role_user`.`role_id` = `roles`.`id`
             WHERE `user_id` = :user_id";
@@ -206,15 +219,23 @@ class User {
   }
 
   public function updateAvatar(int $userId, string $imagePath) {
-    return $this->db->update('users', ['avatar_path' => $imagePath], 'id = :id', ['id' => $userId]);
+    return $this->db->update(
+      'users',
+      ['avatar_path' => $imagePath],
+      'id = :id',
+      ['id' => $userId]
+    );
   }
 
   public function updateProfile(int $userId, array $data) {
-    $allowedFields = ['full_name', 'address'];
+    $allowedFields = ['full_name'];
     $updateData = [];
     foreach ($allowedFields as $field) {
       if (isset($data[$field])) {
-        $updateData[$field] = $data[$field] !== '' ? $data[$field] : null;
+        $updateData[$field] =
+          $data[$field] !== ''
+          ? $data[$field]
+          : null;
       }
     }
 
@@ -227,7 +248,12 @@ class User {
 
   public function changePassword(int $userId, string $newPassword) {
     $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-    return $this->db->update('users', ['password' => $hashedPassword], 'id = :id', ['id' => $userId]);
+    return $this->db->update(
+      'users',
+      ['password' => $hashedPassword],
+      'id = :id',
+      ['id' => $userId]
+    );
   }
 
   public function updateAvatarPath(int $userId, string $avatarPath) {
