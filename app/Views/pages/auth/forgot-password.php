@@ -5,18 +5,18 @@
   <div class="flex flex-col mx-auto md:w-96 w-full">
     <h1 class="text-2xl font-bold mb-4 text-center">Quên mật khẩu</h1>
     <div class="flex flex-col gap-2 mb-4">
-      <label for="email_phone_number">Email / Số điện thoại</label>
+      <label for="email">Email</label>
       <input
-        name="email_phone_number"
+        name="email"
         type="text"
-        placeholder="Nhập Email / Số điện thoại"
+        placeholder="Nhập Email"
         class="input w-full"
-        data-field="email_phone_number"
+        data-field="email"
         required
       />
       <div
         class="error-log hidden"
-        data-field="email_phone_number"
+        data-field="email"
       ></div>
     </div>
 

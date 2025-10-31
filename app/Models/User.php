@@ -23,18 +23,17 @@ class User {
 
   public function getAllUsersWithRole() {
     $sql = "SELECT
-              u.id,
-              u.full_name,
-              u.email,
-              u.phone_number,
-              u.address,
-              u.is_activated,
-              r.name as `role`
+              u.`id`,
+              u.`full_name`,
+              u.`email`,
+              u.`address`,
+              u.`is_activated`,
+              r.`name` as `role`
             FROM `users` u
-            LEFT JOIN `role_user` ru ON u.id = ru.user_id
-            LEFT JOIN `roles` r ON ru.role_id = r.id
-            GROUP BY u.id
-            ORDER BY u.created_at DESC";
+            LEFT JOIN `role_user` ru ON u.`id` = ru.`user_id`
+            LEFT JOIN `roles` r ON ru.`role_id` = r.`id`
+            GROUP BY u.`id`
+            ORDER BY u.`created_at` DESC";
     return $this->db->getAll($sql);
   }
 
@@ -42,7 +41,7 @@ class User {
     $this->db->beginTransaction();
     try {
       // 1. Cập nhật thông tin chi tiết người dùng
-      $allowedFields = ['full_name', 'phone_number', 'address'];
+      $allowedFields = ['full_name', 'address'];
       $updateData = [];
       foreach ($allowedFields as $field) {
         if (isset($details[$field])) {
@@ -81,11 +80,6 @@ class User {
     return $count > 0;
   }
 
-  public function phoneNumberExists(string $phoneNumber) {
-    $count = $this->db->countRows("SELECT id FROM `users` WHERE `phone_number` = ?", [$phoneNumber]);
-    return $count > 0;
-  }
-
   public function createUser(array $formData, string $emailVerificationToken) {
     $now = new DateTime();
     $expiresAt = $now->add(new DateInterval($_ENV['ACTIVATE_EMAIL_TOKEN_LIFETIME']));
@@ -98,9 +92,6 @@ class User {
       'email_verification_token' => $emailVerificationToken,
       'verification_expires_at' => $expiresAtFormatted,
     ];
-    if (!empty($formData['phone_number'])) {
-      $data['phone_number'] = $formData['phone_number'];
-    }
 
     return $this->db->insert('users', $data);
   }
@@ -115,12 +106,6 @@ class User {
     $sql = "SELECT * FROM `users`
             WHERE `email` = :email";
     return $this->db->getOne($sql, ['email' => $email]);
-  }
-
-  public function findUserByPhoneNumber(string $phoneNumber) {
-    $sql = "SELECT * FROM `users`
-            WHERE `phone_number` = :phone_number";
-    return $this->db->getOne($sql, ['phone_number' => $phoneNumber]);
   }
 
   public function findUserByEmailVeriToken(string $token) {
@@ -225,7 +210,7 @@ class User {
   }
 
   public function updateProfile(int $userId, array $data) {
-    $allowedFields = ['full_name', 'phone_number', 'address'];
+    $allowedFields = ['full_name', 'address'];
     $updateData = [];
     foreach ($allowedFields as $field) {
       if (isset($data[$field])) {

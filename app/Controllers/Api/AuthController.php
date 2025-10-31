@@ -3,6 +3,7 @@ namespace App\Controllers\Api;
 
 use Exception, App\Models\User;
 use App\Helpers\Helpers;
+use App\Helpers\Validator;
 use DateTime, DateInterval;
 use Firebase\JWT\JWT;
 use App\Models\RefreshToken;
@@ -28,73 +29,27 @@ class AuthController {
     exit();
   }
 
-  public function checkPhoneNumber() {
-    $phoneNumber = $_POST['phone_number'];
-
-    if (empty($phoneNumber)) {
-      Helpers::sendJsonResponse(false, 'Số điện thoại không được để trống', null, 400);
-    }
-
-    try {
-      $userModel = new User();
-      $exists = $userModel->phoneNumberExists($phoneNumber);
-      Helpers::sendJsonResponse(true, 'Kiểm tra số điện thoại thành công', ['exists' => $exists]);
-    } catch (Exception $e) {
-      error_log("Check phone number failed: ".$e->getMessage());
-      Helpers::sendJsonResponse(false, 'Lỗi hệ thống', null, 500);
-    }
-
-    exit();
-  }
-
   public function handleRegister() {
     if (!Helpers::isPost()) {
       Helpers::sendJsonResponse(false, 'Phương thức không hợp lệ.', null, 405);
     }
 
-    $errors = [];
+    $validator = Validator::make($_POST);
+    $validator->required('full_name', 'Họ tên không được bỏ trống!')
+      ->minLength('full_name', 5, 'Họ tên phải có ít nhất 5 ký tự!')
+      ->required('email', 'Email không được bỏ trống!')
+      ->email('email')
+      ->emailUnique('email')
+      ->required('password', 'Mật khẩu không được để trống!')
+      ->minLength('password', 6, 'Mật khẩu phải lớn hơn 6 ký tự!')
+      ->required('confirm_password', 'Hãy nhập lại mật khẩu!')
+      ->matches('confirm_password', 'password', 'Mật khẩu không khớp!');
+
+    if ($validator->fails()) {
+      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.', $validator->getErrors(), 422);
+    }
+
     $userModel = new User();
-
-    // Validate full_name
-    if (empty($_POST['full_name']))
-      $errors['full_name'][] = "Họ tên không được bỏ trống!";
-    else if (strlen($_POST['full_name']) < 5)
-      $errors['full_name'][] = "Họ tên phải có ít nhất 5 ký tự!";
-
-    // Validate email
-    if (empty($_POST['email']))
-      $errors['email'][] = "Email không được bỏ trống!";
-    else if (!Helpers::validateEmail($_POST['email']))
-      $errors['email'][] = "Email không hợp lệ!";
-    else if ($userModel->emailExists($_POST['email'])) {
-      $errors['email'][] = "Email đã tồn tại!";
-    }
-
-    // Validate phone_number
-    if (!empty($_POST['phone_number'])) {
-      if (!Helpers::isPhone($_POST['phone_number']))
-        $errors['phone_number'][] = "Số điện thoại không hợp lệ!";
-      else if ($userModel->phoneNumberExists($_POST['phone_number']))
-        $errors['phone_number'][] = "Số điện thoại đã tồn tại!";
-    }
-
-    // Validate password
-    if (empty($_POST['password']))
-      $errors['password'][] = "Mật khẩu không được để trống!";
-    else if (strlen($_POST['password']) < 6)
-      $errors['password'][] = "Mật khẩu phải lớn hơn 6 ký tự!";
-
-    // Validate confirm_password
-    if (empty($_POST['confirm_password']))
-      $errors['confirm_password'][] = "Hãy nhập lại mật khẩu!";
-    else if ($_POST['confirm_password'] !== $_POST['password'])
-      $errors['confirm_password'][] = "Mật khẩu không khớp!";
-
-    if (!empty($errors)) {
-      // Mã 422 (Unprocessable Entity) là mã chuẩn cho lỗi validation
-      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.', $errors, 422);
-    }
-
     $emailVerificationToken = bin2hex(random_bytes(32));
     $userId = $userModel->createUser($_POST, $emailVerificationToken);
     $isSetRole = $userModel->setRoleUser($_ENV['DEFAULT_USER_ROLE'], $userId);
@@ -119,37 +74,29 @@ class AuthController {
       Helpers::sendJsonResponse(false, 'Phương thức không hợp lệ.', null, 405);
     }
 
-    $errors = [];
+    $validator = Validator::make($_POST);
+    $validator->required('email', 'Email không được bỏ trống!')
+      ->email('email')
+      ->required('password', 'Mật khẩu không được để trống!');
 
-    if (!empty($_POST['email_phone_number'])) {
-      if (is_numeric($_POST['email_phone_number'])) {
-        if (!Helpers::isPhone($_POST['email_phone_number']))
-          $errors['email_phone_number'][] = "Số điện thoại không hợp lệ!";
-      } else if (!Helpers::validateEmail($_POST['email_phone_number'])) {
-        $errors['email_phone_number'][] = "Email không hợp lệ!";
-      }
-    } else
-      $errors['email_phone_number'][] = "Email / Số điện thoại không được bỏ trống!";
-
-    // Validate password
-    if (empty($_POST['password']))
-      $errors['password'][] = "Mật khẩu không được để trống!";
-
-    if (!empty($errors)) {
-      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.', $errors, 422);
+    if ($validator->fails()) {
+      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.', $validator->getErrors(), 422);
     }
 
     $userModel = new User();
-    $user = (is_numeric($_POST['email_phone_number']))
-      ? $userModel->findUserByPhoneNumber($_POST['email_phone_number'])
-      : $userModel->findUserByEmail($_POST['email_phone_number']);
+    $user = $userModel->findUserByEmail($_POST['email']);
 
     if (!$user || !password_verify($_POST['password'], $user['password'])) {
       Helpers::sendJsonResponse(false, 'Email hoặc mật khẩu không chính xác.', null, 401);
     }
 
     if ($user['is_activated'] == 0) {
-      Helpers::sendJsonResponse(false, 'Tài khoản của bạn chưa được kích hoạt. Vui lòng kiểm tra email.', null, 403);
+      Helpers::sendJsonResponse(
+        false,
+        'Tài khoản của bạn chưa được kích hoạt. Vui lòng kiểm tra email.',
+        null,
+        403
+      );
     }
 
     $tokenModel = new RefreshToken();
@@ -271,26 +218,15 @@ class AuthController {
       Helpers::sendJsonResponse(false, 'Phương thức không hợp lệ.', null, 405);
     }
 
-    if (empty($_POST['email_phone_number']))
-      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.', ['email_phone_number' => 'Email / Số điện thoại không được bỏ trống!'], 422);
+    $validator = Validator::make($_POST);
+    $validator->required('email', 'Email không được bỏ trống!');
 
-    $errors = [];
-
-    if (is_numeric($_POST['email_phone_number'])) {
-      if (!Helpers::isPhone($_POST['email_phone_number']))
-        $errors['email_phone_number'][] = "Số điện thoại không hợp lệ!";
-    } else if (!Helpers::validateEmail($_POST['email_phone_number'])) {
-      $errors['email_phone_number'][] = "Email không hợp lệ!";
-    }
-
-    if (!empty($errors)) {
-      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.', $errors, 422);
+    if ($validator->fails()) {
+      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.', $validator->getErrors(), 422);
     }
 
     $userModel = new User();
-    $user = (is_numeric($_POST['email_phone_number']))
-      ? $userModel->findUserByPhoneNumber($_POST['email_phone_number'])
-      : $userModel->findUserByEmail($_POST['email_phone_number']);
+    $user = $userModel->findUserByEmail($_POST['email']);
 
     if (!$user)
       Helpers::sendJsonResponse(false, 'Email chưa được đăng ký hoặc không chính xác.', null, 401); // 401 Unauthorized => lỗi xác thực
@@ -316,26 +252,17 @@ class AuthController {
       Helpers::sendJsonResponse(false, 'Phương thức không hợp lệ.', null, 405);
     }
 
-    $errors = [];
-
     if (!$_POST['token'])
       Helpers::sendJsonResponse(false, 'Token xác thực không được cung cấp.', null, 400);// 400 bad request
 
-    // Validate password
-    if (empty($_POST['new_password']))
-      $errors['new_password'][] = "Mật khẩu không được để trống!";
-    else if (strlen($_POST['new_password']) < 6)
-      $errors['new_password'][] = "Mật khẩu phải lớn hơn 6 ký tự!";
+    $validator = Validator::make($_POST);
+    $validator->required('new_password', 'Mật khẩu không được để trống!')
+      ->minLength('new_password', 6, 'Mật khẩu phải lớn hơn 6 ký tự!')
+      ->required('confirm_password', 'Hãy nhập lại mật khẩu!')
+      ->matches('confirm_password', 'new_password', 'Mật khẩu không khớp!');
 
-    // Validate confirm_password
-    if (empty($_POST['confirm_password']))
-      $errors['confirm_password'][] = "Hãy nhập lại mật khẩu!";
-    else if ($_POST['confirm_password'] !== $_POST['new_password'])
-      $errors['confirm_password'][] = "Mật khẩu không khớp!";
-
-    if (!empty($errors)) {
-      // Mã 422 (Unprocessable Entity) là mã chuẩn cho lỗi validation
-      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.', $errors, 422);
+    if ($validator->fails()) {
+      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.', $validator->getErrors(), 422);
     }
 
     $userModel = new User();

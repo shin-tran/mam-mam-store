@@ -79,15 +79,6 @@
                 />
               </div>
               <div class="form-control">
-                <label class="label"><span class="label-text">Số điện thoại</span></label>
-                <input
-                  type="tel"
-                  name="phone_number"
-                  value="<?php echo htmlspecialchars($user['phone_number'] ?? ''); ?>"
-                  class="input input-bordered"
-                />
-              </div>
-              <div class="form-control">
                 <label class="label"><span class="label-text">Địa chỉ</span></label>
                 <textarea
                   name="address"
@@ -205,10 +196,24 @@
                         ?>
                         <div class="badge <?php echo $badge_class; ?> badge-sm"><?php echo $status_text; ?></div>
                         <?php if ($order['status'] === 'cancelled' && !empty($order['cancellation_reason'])): ?>
-                          <div class="tooltip tooltip-left" data-tip="<?php echo htmlspecialchars($order['cancellation_reason']); ?>">
+                          <div
+                            class="tooltip tooltip-left"
+                            data-tip="<?php echo htmlspecialchars($order['cancellation_reason']); ?>"
+                          >
                             <!-- Icon -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block ml-1 cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              class="h-4 w-4 inline-block ml-1 cursor-help"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
                             </svg>
                           </div>
                         <?php endif; ?>
@@ -221,14 +226,13 @@
                           >
                             Hủy đơn
                           </button>
-                        <?php else: ?>
-                          <button
-                            class="btn btn-ghost view-order-details-btn"
-                            data-order-id="<?php echo $order['id']; ?>"
-                          >
-                            Xem chi tiết
-                          </button>
                         <?php endif; ?>
+                        <button
+                          class="btn btn-ghost view-order-details-btn"
+                          data-order-id="<?php echo $order['id']; ?>"
+                        >
+                          Xem chi tiết
+                        </button>
                       </td>
                     </tr>
                   <?php endforeach; ?>
