@@ -24,13 +24,6 @@
   />
   <!--end::Primary Meta Tags-->
 
-  <!-- Toastify JS -->
-  <link
-    rel="stylesheet"
-    type="text/css"
-    href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
-  >
-
   <link
     rel="preload"
     href="<?php echo _HOST_URL_PUBLIC ?>/css/app.css"

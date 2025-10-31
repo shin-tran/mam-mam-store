@@ -44,11 +44,9 @@ View::layout('head', ['title' => $title]);
                   <img
                     id="header-avatar-image"
                     alt="User avatar"
-                    src="<?php
-                    $split = explode(" ", $_SESSION['user']['full_name']);
-                    echo $_SESSION['user']['avatar_path']
+                    src="<?php echo $_SESSION['user']['avatar_path']
                       ? _HOST_URL_PUBLIC.$_SESSION['user']['avatar_path']
-                      : "https://placehold.co/40x40?text={$split[count($split) - 1]}";
+                      : 'https://placehold.co/40x40?text='.mb_substr($_SESSION['user']['full_name'], 0, 1);
                     ?>"
                     class="rounded-full"
                   />
