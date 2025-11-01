@@ -33,4 +33,6 @@ coverage/
 
 # User uploads
 /public/uploads/
+/public/css/
+/public/js/
 storage/
