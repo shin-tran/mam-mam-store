@@ -46,3 +46,29 @@ export interface ProductDetail {
   image_path: string;
   stock_quantity: number;
 }
+
+export interface Address {
+  id: number;
+  recipient_name: string;
+  phone_number: string;
+  street_address: string;
+  ward: string;
+  district: string;
+  city: string;
+  is_default: number;
+}
+
+export interface Province {
+  province_id: number;
+  code: string;
+  name: string;
+  type: string;
+}
+
+export interface Ward {
+  ward_id: number;
+  code: string;
+  name: string;
+  type: string;
+  province_code: string;
+}

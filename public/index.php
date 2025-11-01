@@ -72,6 +72,14 @@ $router->post('/api/users/update-avatar', UserController::class, 'updateAvatar',
 $router->post('/api/users/delete/{id}', UserController::class, 'delete', ['auth', 'admin']);
 $router->post('/api/users/update/{id}', UserController::class, 'update', ['auth', 'admin', 'sanitize']);
 
+// User Addresses
+$router->get('/api/users/addresses', UserController::class, 'getAddresses', ['auth']);
+$router->get('/api/users/addresses/{id}', UserController::class, 'getAddress', ['auth']);
+$router->post('/api/users/addresses/create', UserController::class, 'createAddress', ['auth', 'sanitize']);
+$router->post('/api/users/addresses/update/{id}', UserController::class, 'updateAddress', ['auth', 'sanitize']);
+$router->post('/api/users/addresses/delete/{id}', UserController::class, 'deleteAddress', ['auth']);
+$router->post('/api/users/addresses/set-default/{id}', UserController::class, 'setDefaultAddress', ['auth']);
+
 // Products
 $router->post('/api/products/cart', ApiProductController::class, 'getCartProducts', ['auth']);
 $router->post('/api/products/create', ApiProductController::class, 'create', ['auth', 'admin', 'sanitize']);

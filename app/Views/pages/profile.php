@@ -78,13 +78,6 @@
                   disabled
                 />
               </div>
-              <div class="form-control">
-                <label class="label"><span class="label-text">Địa chỉ</span></label>
-                <textarea
-                  name="address"
-                  class="textarea textarea-bordered h-24"
-                ><?php echo htmlspecialchars($user['address'] ?? ''); ?></textarea>
-              </div>
             </div>
             <button
               type="submit"
@@ -140,6 +133,51 @@
               class="btn btn-primary mt-6"
             >Đổi mật khẩu</button>
           </form>
+        </div>
+
+        <input
+          type="radio"
+          name="profile_tabs"
+          role="tab"
+          class="tab"
+          aria-label="Địa chỉ"
+        />
+        <div
+          role="tabpanel"
+          class="tab-content bg-base-100 border-base-300 rounded-box p-6"
+        >
+          <!-- Address Management -->
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-semibold">Danh sách địa chỉ</h3>
+            <button
+              class="btn btn-primary btn-sm"
+              onclick="address_modal.showModal(); resetAddressForm();"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              Thêm địa chỉ mới
+            </button>
+          </div>
+          <div
+            id="addresses-list"
+            class="space-y-3"
+          >
+            <div class="text-center py-8">
+              <span class="loading loading-spinner loading-lg"></span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -341,6 +379,124 @@
         onclick="order_details_modal.close()"
       >Đóng</button>
     </div>
+  </div>
+  <form
+    method="dialog"
+    class="modal-backdrop"
+  >
+    <button>close</button>
+  </form>
+</dialog>
+
+<!-- Address Modal -->
+<dialog
+  id="address_modal"
+  class="modal"
+>
+  <div class="modal-box max-w-2xl">
+    <h3
+      class="font-bold text-lg mb-4"
+      id="address-modal-title"
+    >Thêm địa chỉ mới</h3>
+    <form id="address-form">
+      <input
+        type="hidden"
+        id="address-id"
+        name="address_id"
+      />
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Tên người nhận <span class="text-error">*</span></span>
+          </label>
+          <input
+            type="text"
+            name="recipient_name"
+            class="input input-bordered"
+            required
+          />
+        </div>
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Số điện thoại <span class="text-error">*</span></span>
+          </label>
+          <input
+            type="tel"
+            name="phone_number"
+            class="input input-bordered"
+            required
+          />
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Tỉnh/Thành phố <span class="text-error">*</span></span>
+          </label>
+          <select
+            id="province-select"
+            name="city"
+            class="select select-bordered"
+            required
+          >
+            <option value="">-- Chọn Tỉnh/Thành phố --</option>
+          </select>
+          <input
+            type="hidden"
+            id="province-code"
+            name="province_code"
+          />
+        </div>
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Phường/Xã <span class="text-error">*</span></span>
+          </label>
+          <select
+            id="ward-select"
+            name="ward"
+            class="select select-bordered"
+            required
+            disabled
+          >
+            <option value="">-- Chọn Phường/Xã --</option>
+          </select>
+        </div>
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Địa chỉ đường phố <span class="text-error">*</span></span>
+          </label>
+          <input
+            type="text"
+            name="street_address"
+            class="input input-bordered"
+            placeholder="Số nhà, tên đường..."
+            required
+          />
+        </div>
+      </div>
+      <div class="form-control mt-4">
+        <label class="label cursor-pointer justify-start gap-2">
+          <input
+            type="checkbox"
+            name="is_default"
+            class="checkbox checkbox-primary"
+          />
+          <span class="label-text">Đặt làm địa chỉ mặc định</span>
+        </label>
+      </div>
+      <div class="modal-action">
+        <button
+          type="button"
+          class="btn"
+          onclick="address_modal.close()"
+        >Hủy</button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          id="address-submit-btn"
+        >Lưu địa chỉ</button>
+      </div>
+    </form>
   </div>
   <form
     method="dialog"

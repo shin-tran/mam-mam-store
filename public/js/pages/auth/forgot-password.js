@@ -11,9 +11,9 @@ async function validateField(input) {
     let errorMessage = "";
     Helpers.clearError(fieldName);
     switch (fieldName) {
-        case "email_phone_number":
+        case "email":
             if (!value)
-                errorMessage = "Email / Số điện thoại không được bỏ trống!";
+                errorMessage = "Email không được bỏ trống!";
             else if (Number(value)) {
                 if (!Helpers.isPhone(value))
                     errorMessage = "Số điện thoại không hợp lệ!";

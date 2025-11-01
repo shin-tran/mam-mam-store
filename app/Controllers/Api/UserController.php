@@ -4,6 +4,7 @@ namespace App\Controllers\Api;
 use App\Helpers\Helpers;
 use App\Helpers\Validator;
 use App\Models\User;
+use App\Models\UserAddress;
 use Exception;
 
 class UserController {
@@ -219,9 +220,9 @@ class UserController {
 
     $validator = Validator::make($_POST);
     $validator->required('current_password', 'Mật khẩu hiện tại không được trống.')
-    ->required('new_password', 'Mật khẩu mới không được trống.')
-    ->minLength('new_password', 6, 'Mật khẩu mới phải có ít nhất 6 ký tự.')
-    ->matches($_POST['new_password'], $_POST['confirm_password'], 'Mật khẩu xác nhận không khớp.');
+      ->required('new_password', 'Mật khẩu mới không được trống.')
+      ->minLength('new_password', 6, 'Mật khẩu mới phải có ít nhất 6 ký tự.')
+      ->matches($_POST['new_password'], $_POST['confirm_password'], 'Mật khẩu xác nhận không khớp.');
 
     if ($validator->fails()) {
       Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', $validator->getErrors(), 422);
@@ -247,9 +248,9 @@ class UserController {
 
     $validator = Validator::make($_POST);
     $validator->required('current_password', 'Mật khẩu hiện tại không được trống.')
-    ->required('new_password', 'Mật khẩu mới không được trống.')
-    ->minLength('new_password', 6, 'Mật khẩu mới phải có ít nhất 6 ký tự.')
-    ->matches($_POST['new_password'], $_POST['confirm_password'], 'Mật khẩu xác nhận không khớp.');
+      ->required('new_password', 'Mật khẩu mới không được trống.')
+      ->minLength('new_password', 6, 'Mật khẩu mới phải có ít nhất 6 ký tự.')
+      ->matches($_POST['new_password'], $_POST['confirm_password'], 'Mật khẩu xác nhận không khớp.');
 
     if ($validator->fails()) {
       Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', $validator->getErrors(), 422);
@@ -267,6 +268,160 @@ class UserController {
       Helpers::sendJsonResponse(true, 'Đổi mật khẩu thành công.');
     } else {
       Helpers::sendJsonResponse(false, 'Đổi mật khẩu thất bại, vui lòng thử lại.', null, 500);
+    }
+  }
+
+  /**
+   * Lấy danh sách địa chỉ của user
+   */
+  public function getAddresses($userData) {
+    $userId = $userData->data->userId;
+    $addressModel = new UserAddress();
+    $addresses = $addressModel->getAddressesByUserId($userId);
+    Helpers::sendJsonResponse(true, 'Lấy danh sách địa chỉ thành công.', $addresses);
+  }
+
+  /**
+   * Lấy chi tiết một địa chỉ
+   */
+  public function getAddress($addressId, $userData) {
+    $userId = $userData->data->userId;
+    $addressModel = new UserAddress();
+    $address = $addressModel->getAddressById($addressId, $userId);
+
+    if ($address) {
+      Helpers::sendJsonResponse(true, 'Lấy thông tin địa chỉ thành công.', $address);
+    } else {
+      Helpers::sendJsonResponse(false, 'Không tìm thấy địa chỉ.', null, 404);
+    }
+  }
+
+  /**
+   * Tạo địa chỉ mới
+   */
+  public function createAddress($userData) {
+    $userId = $userData->data->userId;
+
+    $validator = Validator::make($_POST);
+    $validator->required('recipient_name', 'Tên người nhận không được để trống.')
+      ->required('phone_number', 'Số điện thoại không được để trống.')
+      ->phone('phone_number')
+      ->required('street_address', 'Địa chỉ đường phố không được để trống.')
+      ->required('ward', 'Phường/Xã không được để trống.')
+      ->required('city', 'Tỉnh/Thành phố không được để trống.');
+
+    if ($validator->fails()) {
+      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', $validator->getErrors(), 422);
+    }
+
+    try {
+      $addressModel = new UserAddress();
+      $_POST['user_id'] = $userId;
+
+      $addressId = $addressModel->createAddress($_POST);
+
+      if ($addressId) {
+        $newAddress = $addressModel->getAddressById($addressId, $userId);
+        Helpers::sendJsonResponse(true, 'Thêm địa chỉ thành công.', $newAddress);
+      } else {
+        throw new Exception('Không thể tạo địa chỉ.');
+      }
+    } catch (Exception $e) {
+      error_log("Create address error: ".$e->getMessage());
+      Helpers::sendJsonResponse(false, 'Thêm địa chỉ thất bại do lỗi hệ thống.', null, 500);
+    }
+  }
+
+  /**
+   * Cập nhật địa chỉ
+   */
+  public function updateAddress($addressId, $userData) {
+    $userId = $userData->data->userId;
+
+    $validator = Validator::make($_POST);
+    $validator->required('recipient_name', 'Tên người nhận không được để trống.')
+      ->required('phone_number', 'Số điện thoại không được để trống.')
+      ->phone('phone_number')
+      ->required('street_address', 'Địa chỉ đường phố không được để trống.')
+      ->required('ward', 'Phường/Xã không được để trống.')
+      ->required('city', 'Tỉnh/Thành phố không được để trống.');
+
+    if ($validator->fails()) {
+      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', $validator->getErrors(), 422);
+    }
+
+    try {
+      $addressModel = new UserAddress();
+
+      // Kiểm tra địa chỉ có thuộc user không
+      $existingAddress = $addressModel->getAddressById($addressId, $userId);
+      if (!$existingAddress) {
+        Helpers::sendJsonResponse(false, 'Không tìm thấy địa chỉ.', null, 404);
+        return;
+      }
+
+      $isUpdated = $addressModel->updateAddress($addressId, $userId, $_POST);
+
+      if ($isUpdated) {
+        $updatedAddress = $addressModel->getAddressById($addressId, $userId);
+        Helpers::sendJsonResponse(true, 'Cập nhật địa chỉ thành công.', $updatedAddress);
+      } else {
+        throw new Exception('Cập nhật thất bại.');
+      }
+    } catch (Exception $e) {
+      error_log("Update address error: ".$e->getMessage());
+      Helpers::sendJsonResponse(false, 'Cập nhật địa chỉ thất bại do lỗi hệ thống.', null, 500);
+    }
+  }
+
+  /**
+   * Xóa địa chỉ
+   */
+  public function deleteAddress($addressId, $userData) {
+    $userId = $userData->data->userId;
+    $addressModel = new UserAddress();
+
+    // Kiểm tra địa chỉ có thuộc user không
+    $existingAddress = $addressModel->getAddressById($addressId, $userId);
+    if (!$existingAddress) {
+      Helpers::sendJsonResponse(false, 'Không tìm thấy địa chỉ.', null, 404);
+      return;
+    }
+
+    $isDeleted = $addressModel->deleteAddress($addressId, $userId);
+
+    if ($isDeleted) {
+      Helpers::sendJsonResponse(true, 'Xóa địa chỉ thành công.');
+    } else {
+      Helpers::sendJsonResponse(false, 'Xóa địa chỉ thất bại.', null, 500);
+    }
+  }
+
+  /**
+   * Đặt địa chỉ mặc định
+   */
+  public function setDefaultAddress($addressId, $userData) {
+    $userId = $userData->data->userId;
+    $addressModel = new UserAddress();
+
+    // Kiểm tra địa chỉ có thuộc user không
+    $existingAddress = $addressModel->getAddressById($addressId, $userId);
+    if (!$existingAddress) {
+      Helpers::sendJsonResponse(false, 'Không tìm thấy địa chỉ.', null, 404);
+      return;
+    }
+
+    try {
+      $isSet = $addressModel->setDefaultAddress($addressId, $userId);
+
+      if ($isSet) {
+        Helpers::sendJsonResponse(true, 'Đặt địa chỉ mặc định thành công.');
+      } else {
+        throw new Exception('Đặt địa chỉ mặc định thất bại.');
+      }
+    } catch (Exception $e) {
+      error_log("Set default address error: ".$e->getMessage());
+      Helpers::sendJsonResponse(false, 'Đặt địa chỉ mặc định thất bại do lỗi hệ thống.', null, 500);
     }
   }
 }
