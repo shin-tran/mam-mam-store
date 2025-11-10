@@ -30,15 +30,6 @@ async function validateField(input: HTMLInputElement): Promise<boolean> {
         errorMessage = "Email này đã được sử dụng!";
       break;
 
-    case "phone_number":
-      if (value) {
-        if (!Helpers.isPhone(value))
-          errorMessage = "Số điện thoại không hợp lệ!";
-        else if (await authService.checkPhoneNumberExists(value))
-          errorMessage = "Số điện thoại này đã được sử dụng!";
-      }
-      break;
-
     case "password":
       if (!value) errorMessage = "Mật khẩu không được để trống!";
       else if (value.length < 6)

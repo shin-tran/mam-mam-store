@@ -44,21 +44,6 @@
     </div>
 
     <div class="flex flex-col gap-2 mb-4">
-      <label for="phone_number">Số điện thoại</label>
-      <input
-        name="phone_number"
-        type="tel"
-        placeholder="Nhập số điện thoại"
-        class="input w-full"
-        data-field="phone_number"
-      />
-      <div
-        class="error-log hidden"
-        data-field="phone_number"
-      ></div>
-    </div>
-
-    <div class="flex flex-col gap-2 mb-4">
       <label
         for="password"
         class="required"
