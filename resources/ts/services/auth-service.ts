@@ -1,5 +1,6 @@
 import { AppConfig } from "../app.js";
-import type { ApiResponse, LoginResponse } from "../type.js";
+import type { ApiResponse } from "../types/api.js";
+import type { LoginResponse } from "../types/auth.js";
 import { Helpers } from "../utils/helpers.js";
 
 class AuthService {

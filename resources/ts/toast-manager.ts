@@ -1,4 +1,4 @@
-import type { ToastType } from "./type.js";
+import type { ToastType } from "./types/toast.js";
 
 class ToastManager {
   private toastContainer: HTMLDivElement;

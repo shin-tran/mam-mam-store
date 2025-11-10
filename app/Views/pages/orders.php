@@ -249,5 +249,5 @@
 </main>
 <script
   type="module"
-  src="<?php echo _HOST_URL_PUBLIC ?>/js/pages/orders.js"
+  src="<?php echo _HOST_URL_PUBLIC ?>/js/pages/orders/index.js"
 ></script>

@@ -1,6 +1,6 @@
 import { authService } from "../services/auth-service.js";
 import { toastManager } from "../toast-manager.js";
-import type { Address, Province, Ward } from "../type.js";
+import type { Address, Province, Ward } from "../types/address.js";
 
 const detailsForm = document.getElementById("details-form") as HTMLFormElement;
 const avatarForm = document.getElementById("avatar-form") as HTMLFormElement;
