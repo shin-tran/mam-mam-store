@@ -57,42 +57,140 @@
         id="checkout_modal"
         class="modal"
       >
-        <div class="modal-box w-11/12 max-w-2xl">
+        <div class="modal-box w-11/12 max-w-2xl max-h-[90vh] overflow-y-auto">
+          <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+          </form>
           <h3 class="font-bold text-2xl mb-6">Thông tin giao hàng & Thanh toán</h3>
           <form
             method="dialog"
             id="checkout-form"
           >
             <div class="space-y-4">
-              <!-- Thông tin cá nhân -->
+              <!-- Chọn địa chỉ giao hàng -->
               <div>
-                <label class="label"><span class="label-text">Họ và tên</span></label>
-                <input
-                  type="text"
-                  placeholder="Nguyễn Văn A"
-                  class="input input-bordered w-full"
-                  required
-                />
-              </div>
-              <div>
-                <label class="label"><span class="label-text">Số điện thoại</span></label>
-                <input
-                  type="tel"
-                  placeholder="09xxxxxxxx"
-                  class="input input-bordered w-full"
-                  required
-                />
-              </div>
-              <div>
-                <label class="label"><span class="label-text">Địa chỉ nhận hàng</span></label>
-                <textarea
-                  class="textarea textarea-bordered w-full"
-                  placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố"
-                  required
-                ></textarea>
+                <label class="label">
+                  <span class="label-text font-semibold">Địa chỉ giao hàng</span>
+                </label>
+                <div
+                  id="addresses-container"
+                  class="space-y-2"
+                >
+                  <!-- Danh sách địa chỉ sẽ được render bằng JS -->
+                  <div class="flex justify-center py-4">
+                    <span class="loading loading-spinner loading-md"></span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  class="btn btn-outline btn-sm mt-2"
+                  id="add-new-address-btn"
+                >
+                  <i class="fa-solid fa-plus"></i> Thêm địa chỉ mới
+                </button>
               </div>
 
               <div class="divider"></div>
+
+              <!-- Form thêm địa chỉ mới (ẩn mặc định) -->
+              <div
+                id="new-address-form"
+                class="hidden space-y-4"
+              >
+                <h4 class="font-semibold text-lg">Thêm địa chỉ mới</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="label">
+                      <span class="label-text">Tên người nhận <span class="text-error">*</span></span>
+                    </label>
+                    <input
+                      type="text"
+                      id="new-recipient-name"
+                      placeholder="Nguyễn Văn A"
+                      class="input input-bordered w-full"
+                    />
+                  </div>
+                  <div>
+                    <label class="label">
+                      <span class="label-text">Số điện thoại <span class="text-error">*</span></span>
+                    </label>
+                    <input
+                      type="tel"
+                      id="new-phone-number"
+                      placeholder="09xxxxxxxx"
+                      class="input input-bordered w-full"
+                    />
+                  </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="label">
+                      <span class="label-text">Tỉnh/Thành phố <span class="text-error">*</span></span>
+                    </label>
+                    <select
+                      id="new-province-select"
+                      class="select select-bordered w-full"
+                    >
+                      <option value="">-- Chọn Tỉnh/Thành phố --</option>
+                    </select>
+                    <input
+                      type="hidden"
+                      id="new-province-code"
+                    />
+                  </div>
+                  <div>
+                    <label class="label">
+                      <span class="label-text">Phường/Xã <span class="text-error">*</span></span>
+                    </label>
+                    <select
+                      id="new-ward-select"
+                      class="select select-bordered w-full"
+                      disabled
+                    >
+                      <option value="">-- Chọn Phường/Xã --</option>
+                    </select>
+                  </div>
+                  <div class="md:col-span-2">
+                    <label class="label">
+                      <span class="label-text">Địa chỉ đường phố <span class="text-error">*</span></span>
+                    </label>
+                    <input
+                      type="text"
+                      id="new-street-address"
+                      placeholder="Số nhà, tên đường..."
+                      class="input input-bordered w-full"
+                    />
+                  </div>
+                </div>
+                <div class="form-control">
+                  <label class="label cursor-pointer justify-start gap-2">
+                    <input
+                      type="checkbox"
+                      id="new-is-default"
+                      class="checkbox checkbox-primary"
+                    />
+                    <span class="label-text">Đặt làm địa chỉ mặc định</span>
+                  </label>
+                </div>
+                <div class="flex gap-2">
+                  <button
+                    type="button"
+                    id="save-new-address-btn"
+                    class="btn btn-primary btn-sm flex-1"
+                  >
+                    Lưu địa chỉ
+                  </button>
+                  <button
+                    type="button"
+                    id="cancel-new-address-btn"
+                    class="btn btn-ghost btn-sm"
+                  >
+                    Hủy
+                  </button>
+                </div>
+
+                <div class="divider"></div>
+              </div>
 
               <!-- Phương thức thanh toán -->
               <h4 class="font-semibold text-lg">Phương thức thanh toán</h4>
@@ -107,7 +205,7 @@
                   <span class="label-text">Thanh toán khi nhận hàng (COD)</span>
                 </label>
               </div>
-              <div class="form-control">
+              <!-- <div class="form-control">
                 <label class="label cursor-pointer justify-start gap-4">
                   <input
                     type="radio"
@@ -116,7 +214,7 @@
                   />
                   <span class="label-text">Chuyển khoản ngân hàng</span>
                 </label>
-              </div>
+              </div> -->
             </div>
 
             <div class="modal-action mt-8">

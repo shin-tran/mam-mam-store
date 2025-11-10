@@ -21,19 +21,44 @@ const successModal = document.getElementById(
 ) as HTMLDialogElement;
 const continueShoppingBtn = successModal?.querySelector("button");
 
-// User Info inputs in modal
-const nameInput = checkoutForm.querySelector(
-  'input[type="text"]'
+// Address Elements
+const addressesContainer = document.getElementById("addresses-container");
+const newAddressForm = document.getElementById("new-address-form");
+const addNewAddressBtn = document.getElementById("add-new-address-btn");
+const saveNewAddressBtn = document.getElementById(
+  "save-new-address-btn"
+) as HTMLButtonElement;
+const cancelNewAddressBtn = document.getElementById("cancel-new-address-btn");
+
+// New address inputs
+const newRecipientNameInput = document.getElementById(
+  "new-recipient-name"
 ) as HTMLInputElement;
-const phoneInput = checkoutForm.querySelector(
-  'input[type="tel"]'
+const newPhoneNumberInput = document.getElementById(
+  "new-phone-number"
 ) as HTMLInputElement;
-const addressTextarea = checkoutForm.querySelector(
-  "textarea"
-) as HTMLTextAreaElement;
+const newStreetAddressInput = document.getElementById(
+  "new-street-address"
+) as HTMLInputElement;
+const newProvinceSelect = document.getElementById(
+  "new-province-select"
+) as HTMLSelectElement;
+const newWardSelect = document.getElementById(
+  "new-ward-select"
+) as HTMLSelectElement;
+const newProvinceCodeInput = document.getElementById(
+  "new-province-code"
+) as HTMLInputElement;
+const newIsDefaultCheckbox = document.getElementById(
+  "new-is-default"
+) as HTMLInputElement;
 
 // State
 let fullProductInfo: any[] = []; // To store product details fetched from API
+let userAddresses: any[] = []; // To store user's saved addresses
+let selectedAddressId: number | null = null; // Currently selected address
+let provinces: any[] = []; // To store provinces data
+let wards: any[] = []; // To store wards data
 
 /**
  * Main function to initialize the cart page
@@ -68,7 +93,7 @@ async function initializeCart() {
         .filter((p: any) => p.quantity > 0);
 
       renderCart();
-      fetchAndFillUserInfo();
+      fetchUserAddresses();
     } else {
       throw new Error(result.message);
     }
@@ -264,6 +289,301 @@ function displayError(message: string) {
   }
 }
 
+/**
+ * Fetch user's saved addresses from API
+ */
+async function fetchUserAddresses() {
+  try {
+    const response = await authService.fetchWithAuth("/api/users/addresses");
+    if (!response.ok) {
+      renderAddressesError();
+      return;
+    }
+
+    const result = await response.json();
+    if (result.success && result.data) {
+      userAddresses = result.data;
+      renderAddresses();
+
+      // Auto-select default address
+      const defaultAddress = userAddresses.find((addr) => addr.is_default === 1);
+      if (defaultAddress) {
+        selectedAddressId = defaultAddress.id;
+      } else if (userAddresses.length > 0) {
+        selectedAddressId = userAddresses[0].id;
+      }
+    } else {
+      renderAddressesEmpty();
+    }
+  } catch (error) {
+    console.error("Failed to fetch addresses:", error);
+    renderAddressesError();
+  }
+}
+
+/**
+ * Render user addresses as radio buttons
+ */
+function renderAddresses() {
+  if (!addressesContainer) return;
+
+  if (userAddresses.length === 0) {
+    renderAddressesEmpty();
+    return;
+  }
+
+  addressesContainer.innerHTML = userAddresses
+    .map(
+      (address) => `
+      <div class="form-control">
+        <label class="label cursor-pointer justify-start gap-3 border rounded-lg p-4 hover:bg-base-200 transition-colors ${
+          address.is_default === 1 ? 'border-primary bg-primary/5' : 'border-base-300'
+        }">
+          <input
+            type="radio"
+            name="selected-address"
+            value="${address.id}"
+            class="radio radio-primary"
+            ${address.is_default === 1 ? 'checked' : ''}
+          />
+          <div class="flex-1">
+            <div class="font-semibold">
+              ${address.recipient_name}
+              ${address.is_default === 1 ? '<span class="badge badge-primary badge-sm ml-2">Mặc định</span>' : ''}
+            </div>
+            <div class="text-sm opacity-70">${address.phone_number}</div>
+            <div class="text-sm opacity-70">${address.street_address}, ${address.ward}, ${address.city}</div>
+          </div>
+        </label>
+      </div>
+    `
+    )
+    .join("");
+
+  // Add event listeners to radio buttons
+  const radioButtons = addressesContainer.querySelectorAll(
+    'input[name="selected-address"]'
+  );
+  radioButtons.forEach((radio) => {
+    radio.addEventListener("change", (e) => {
+      selectedAddressId = parseInt((e.target as HTMLInputElement).value);
+    });
+  });
+}
+
+/**
+ * Render empty state for addresses
+ */
+function renderAddressesEmpty() {
+  if (!addressesContainer) return;
+  addressesContainer.innerHTML = `
+    <div class="text-center py-4 text-sm opacity-70">
+      Bạn chưa có địa chỉ nào. Vui lòng thêm địa chỉ mới.
+    </div>
+  `;
+}
+
+/**
+ * Render error state for addresses
+ */
+function renderAddressesError() {
+  if (!addressesContainer) return;
+  addressesContainer.innerHTML = `
+    <div class="alert alert-error">
+      <span>Không thể tải danh sách địa chỉ. Vui lòng thử lại.</span>
+    </div>
+  `;
+}
+
+/**
+ * Show new address form
+ */
+function showNewAddressForm() {
+  if (newAddressForm) {
+    newAddressForm.classList.remove("hidden");
+  }
+  loadProvinces();
+}
+
+/**
+ * Load provinces from API
+ */
+async function loadProvinces() {
+  if (!newProvinceSelect) return;
+
+  try {
+    const response = await fetch(
+      "https://tinhthanhpho.com/api/v1/new-provinces?limit=36"
+    );
+    const result = await response.json();
+
+    if (result.success && result.data) {
+      provinces = result.data;
+      newProvinceSelect.innerHTML =
+        '<option value="">-- Chọn Tỉnh/Thành phố --</option>';
+      provinces.forEach((province: any) => {
+        const option = document.createElement("option");
+        option.value = `${province.type} ${province.name}`;
+        option.setAttribute("data-code", province.code);
+        option.textContent = province.name;
+        newProvinceSelect.appendChild(option);
+      });
+    }
+  } catch (error) {
+    console.error("Failed to load provinces:", error);
+    toastManager.createToast({
+      message: "Không thể tải danh sách tỉnh/thành phố",
+      type: "error",
+    });
+  }
+}
+
+/**
+ * Handle province change to load wards
+ */
+async function handleProvinceChange() {
+  if (!newProvinceSelect || !newWardSelect || !newProvinceCodeInput) return;
+
+  const selectedOption =
+    newProvinceSelect.options[newProvinceSelect.selectedIndex];
+  if (!selectedOption) return;
+
+  const provinceCode = selectedOption.getAttribute("data-code");
+
+  if (!provinceCode) {
+    newWardSelect.disabled = true;
+    newWardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
+    newProvinceCodeInput.value = "";
+    return;
+  }
+
+  newProvinceCodeInput.value = provinceCode;
+  newWardSelect.disabled = true;
+  newWardSelect.innerHTML = '<option value="">Đang tải...</option>';
+
+  try {
+    const response = await fetch(
+      `https://tinhthanhpho.com/api/v1/new-provinces/${provinceCode}/wards?limit=170`
+    );
+    const result = await response.json();
+
+    if (result.success && result.data) {
+      wards = result.data;
+      newWardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
+      wards.forEach((ward: any) => {
+        const option = document.createElement("option");
+        option.value = `${ward.type} ${ward.name}`;
+        option.textContent = ward.name;
+        newWardSelect.appendChild(option);
+      });
+      newWardSelect.disabled = false;
+    }
+  } catch (error) {
+    console.error("Failed to load wards:", error);
+    newWardSelect.innerHTML = '<option value="">Lỗi khi tải phường/xã</option>';
+    toastManager.createToast({
+      message: "Không thể tải danh sách phường/xã",
+      type: "error",
+    });
+  }
+}
+
+/**
+ * Hide new address form
+ */
+function hideNewAddressForm() {
+  if (newAddressForm) {
+    newAddressForm.classList.add("hidden");
+    clearNewAddressForm();
+  }
+}
+
+/**
+ * Clear new address form inputs
+ */
+function clearNewAddressForm() {
+  if (newRecipientNameInput) newRecipientNameInput.value = "";
+  if (newPhoneNumberInput) newPhoneNumberInput.value = "";
+  if (newStreetAddressInput) newStreetAddressInput.value = "";
+  if (newProvinceSelect) newProvinceSelect.selectedIndex = 0;
+  if (newWardSelect) {
+    newWardSelect.selectedIndex = 0;
+    newWardSelect.disabled = true;
+  }
+  if (newProvinceCodeInput) newProvinceCodeInput.value = "";
+  if (newIsDefaultCheckbox) newIsDefaultCheckbox.checked = false;
+}
+
+/**
+ * Save new address
+ */
+async function saveNewAddress() {
+  const recipientName = newRecipientNameInput?.value.trim();
+  const phoneNumber = newPhoneNumberInput?.value.trim();
+  const streetAddress = newStreetAddressInput?.value.trim();
+  const ward = newWardSelect?.value.trim();
+  const city = newProvinceSelect?.value.trim();
+  const isDefault = newIsDefaultCheckbox?.checked ? 1 : 0;
+
+  // Validation
+  if (!recipientName || !phoneNumber || !streetAddress || !ward || !city) {
+    toastManager.createToast({
+      message: "Vui lòng điền đầy đủ thông tin địa chỉ",
+      type: "error",
+    });
+    return;
+  }
+
+  try {
+    if (saveNewAddressBtn) {
+      saveNewAddressBtn.disabled = true;
+      saveNewAddressBtn.innerHTML = `<span class="loading loading-spinner loading-sm"></span> Đang lưu...`;
+    }
+
+    const response = await authService.fetchWithAuth(
+      "/api/users/addresses/create",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          recipient_name: recipientName,
+          phone_number: phoneNumber,
+          street_address: streetAddress,
+          ward: ward,
+          city: city,
+          is_default: isDefault.toString(),
+        }),
+      }
+    );
+
+    const result = await response.json();
+
+    if (result.success) {
+      toastManager.createToast({
+        message: "Thêm địa chỉ thành công",
+        type: "success",
+      });
+      hideNewAddressForm();
+      await fetchUserAddresses();
+    } else {
+      toastManager.createToast({
+        message: result.message || "Thêm địa chỉ thất bại",
+        type: "error",
+      });
+    }
+  } catch (error) {
+    toastManager.createToast({
+      message: "Lỗi kết nối máy chủ",
+      type: "error",
+    });
+  } finally {
+    if (saveNewAddressBtn) {
+      saveNewAddressBtn.disabled = false;
+      saveNewAddressBtn.innerHTML = `Lưu địa chỉ`;
+    }
+  }
+}
+
 async function fetchAndFillUserInfo() {
   try {
     const response = await authService.fetchWithAuth("/api/profile/info");
@@ -272,9 +592,13 @@ async function fetchAndFillUserInfo() {
     const result = await response.json();
     if (result.success && result.data) {
       const user = result.data;
-      if (nameInput) nameInput.value = user.full_name || "";
-      if (phoneInput) phoneInput.value = user.phone_number || "";
-      if (addressTextarea) addressTextarea.value = user.address || "";
+      // Pre-fill new address form with user info
+      if (newRecipientNameInput && !newRecipientNameInput.value) {
+        newRecipientNameInput.value = user.full_name || "";
+      }
+      if (newPhoneNumberInput && !newPhoneNumberInput.value) {
+        newPhoneNumberInput.value = user.phone_number || "";
+      }
     }
   } catch (e) {
     console.warn("Could not pre-fill user info for checkout.");
@@ -284,16 +608,40 @@ async function fetchAndFillUserInfo() {
 async function handleCheckout(event: SubmitEvent) {
   event.preventDefault();
 
+  // Validate selected address
+  if (!selectedAddressId) {
+    toastManager.createToast({
+      message: "Vui lòng chọn địa chỉ giao hàng",
+      type: "error",
+    });
+    return;
+  }
+
   const submitButton = (event.target as HTMLFormElement).querySelector(
     'button[type="submit"]'
   ) as HTMLButtonElement;
   submitButton.disabled = true;
   submitButton.innerHTML = `<span class="loading loading-spinner"></span> Đang xử lý...`;
 
+  // Get selected address details
+  const selectedAddress = userAddresses.find(
+    (addr) => addr.id === selectedAddressId
+  );
+
+  if (!selectedAddress) {
+    toastManager.createToast({
+      message: "Địa chỉ không hợp lệ",
+      type: "error",
+    });
+    submitButton.disabled = false;
+    submitButton.innerHTML = `Xác nhận đặt hàng`;
+    return;
+  }
+
   const shippingInfo = {
-    name: nameInput.value,
-    phone: phoneInput.value,
-    address: addressTextarea.value,
+    name: selectedAddress.recipient_name,
+    phone: selectedAddress.phone_number,
+    address: `${selectedAddress.street_address}, ${selectedAddress.ward}, ${selectedAddress.city}`,
     note: "", // Can add a note field later
   };
 
@@ -337,6 +685,15 @@ document.addEventListener("DOMContentLoaded", initializeCart);
 cartItemsContainer?.addEventListener("click", handleCartActions);
 checkoutForm?.addEventListener("submit", handleCheckout);
 continueShoppingBtn?.addEventListener("click", () => Helpers.redirect("/"));
+
+// Address form event listeners
+addNewAddressBtn?.addEventListener("click", () => {
+  showNewAddressForm();
+  fetchAndFillUserInfo();
+});
+saveNewAddressBtn?.addEventListener("click", saveNewAddress);
+cancelNewAddressBtn?.addEventListener("click", hideNewAddressForm);
+newProvinceSelect?.addEventListener("change", handleProvinceChange);
 
 // Also close the modal if clicked outside
 checkoutModal.addEventListener("click", (event) => {

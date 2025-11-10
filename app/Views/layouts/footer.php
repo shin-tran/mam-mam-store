@@ -402,7 +402,7 @@
 </footer>
 
 <!-- Copyright Bar -->
-<footer class="footer footer-center p-6 bg-base-300 text-base-content border-t border-base-content/10">
+<footer class="footer footer-center p-2 bg-base-300 text-base-content border-t border-base-content/10">
   <aside class="flex flex-col md:flex-row items-center gap-4">
     <div class="flex items-center gap-2">
       <svg
