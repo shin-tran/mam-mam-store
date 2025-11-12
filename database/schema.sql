@@ -5,6 +5,8 @@ SET
 -- edit my.cnf: default_time_zone = +07:00 after [mysqld]
 USE mam_mam_store;
 
+SET session default_storage_engine = InnoDB;
+
 CREATE TABLE
   `users` (
     `id` INT PRIMARY KEY AUTO_INCREMENT,

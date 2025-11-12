@@ -126,7 +126,7 @@ class AuthController {
       [
         'expires' => $refreshTokenExpiresAt->getTimestamp(),
         'path' => '/',
-        // 'secure' => true, //NOTE: Uncomment if the website have https
+        'secure' => $_ENV['APP_ENV'] === 'production', // Tự động bật HTTPS khi production
         'httponly' => true,
         'samesite' => 'Strict'
       ]
@@ -347,7 +347,7 @@ class AuthController {
       [
         'expires' => time() - 3600, // Hết hạn 1 giờ trước
         'path' => '/',
-        // 'secure' => true, //NOTE: Uncomment if the website have https
+        'secure' => $_ENV['APP_ENV'] === 'production', // Tự động bật HTTPS khi production
         'httponly' => true,
         'samesite' => 'Strict'
       ]

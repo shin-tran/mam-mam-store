@@ -58,3 +58,4 @@ jobs:
           tsconfig.json
           .env
           .env.example
+          bun.lock
