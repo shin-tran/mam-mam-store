@@ -56,11 +56,12 @@ INSERT INTO `products` (`product_name`, `price`, `stock_quantity`, `description`
 INSERT INTO
   `serviceable_locations` (`city`, `district`)
 VALUES
-  ('Hồ Chí Minh', 'Quận 1'),
-  ('Hồ Chí Minh', 'Quận 3'),
-  ('Hồ Chí Minh', 'Quận 10'),
-  ('Hồ Chí Minh', 'Quận Gò Vấp'),
-  ('Hồ Chí Minh', 'Quận Bình Thạnh');
+  ('Hồ Chí Minh', 'Sài Gòn'),
+  ('Hồ Chí Minh', 'Bình Thạnh'),
+  ('Hồ Chí Minh', 'Phú Nhuận'),
+  ('Hồ Chí Minh', 'Thủ Đức'),
+  ('Hồ Chí Minh', 'Nhà Bè'),
+  ('Hồ Chí Minh', 'Gò Vấp');
 
 -- Thêm một số cấu hình mặc định
 INSERT INTO
@@ -68,7 +69,7 @@ INSERT INTO
 VALUES
   (
     'FREE_SHIPPING_THRESHOLD',
-    '300000',
+    '1500000',
     'Ngưỡng miễn phí vận chuyển (VND). Đặt 0 nếu không miễn phí.'
   ),
   (

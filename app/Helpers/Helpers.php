@@ -74,20 +74,6 @@ class Helpers {
     echo "<div class=\"alert alert-{$type}\" role=\"alert\">{$msg}</div>";
   }
 
-  public static function removePathFolder($requestPath) {
-    if ($_ENV['BASE_PROJECT_NAME'] != '') {
-      if (strpos($requestPath, $_ENV['BASE_PROJECT_NAME']) === 0) {
-        $requestPath = substr($requestPath, strlen($_ENV['BASE_PROJECT_NAME']));
-      }
-    }
-
-    if (empty($requestPath)) {
-      $requestPath = '/';
-    }
-
-    return $requestPath;
-  }
-
   public static function sendMail($emailTo, $subject, $content) {
     $mail = new PHPMailer(true);
 

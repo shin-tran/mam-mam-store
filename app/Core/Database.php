@@ -17,6 +17,7 @@ class Database {
       $dsn_template = "%s:host=%s;port=%s;dbname=%s";
       $dsn = sprintf($dsn_template, $_ENV["DB_DRIVER"], $_ENV["DB_HOST"], $_ENV["DB_PORT"], $_ENV["DB_DB"]);
       $this->connect = new PDO($dsn, $_ENV["DB_USER"], $_ENV["DB_PASS"], $options);
+      $this->connect->exec("SET time_zone = '+07:00'");
     } catch (Exception $ex) {
       $this->writeErrorLog($ex);
       exit();

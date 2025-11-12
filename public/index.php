@@ -5,6 +5,7 @@ use App\Controllers\DashboardController;
 use App\Controllers\Api\CategoryController;
 use App\Controllers\Api\OrderController as ApiOrderController;
 use App\Controllers\Api\UserController as ApiUserController;
+use App\Controllers\Api\ShippingController;
 
 date_default_timezone_set("Asia/Ho_Chi_Minh");
 session_start();
@@ -98,13 +99,15 @@ $router->post('/api/categories/create', CategoryController::class, 'create', ['a
 $router->post('/api/categories/update/{id}', CategoryController::class, 'update', ['auth', 'admin', 'sanitize']);
 $router->post('/api/categories/delete/{id}', CategoryController::class, 'delete', ['auth', 'admin']);
 
+// Shipping
+$router->get('/api/shipping/config', ShippingController::class, 'getConfig');
+
 // --- DISPATCH ROUTER ---
 $requestUri = $_SERVER['REQUEST_URI'];
 $requestPath = parse_url($requestUri, PHP_URL_PATH);
 $requestMethod = $_SERVER['REQUEST_METHOD'];
-$finalPath = Helpers::removePathFolder($requestPath);
 
-$router->dispatch($finalPath, $requestMethod);
+$router->dispatch($requestPath, $requestMethod);
 
 ob_end_flush();
 

@@ -1,6 +1,7 @@
 import { authService } from "../../services/auth-service.js";
 import { toastManager } from "../../toast-manager.js";
 import type { CartItem, LocalStorageCartItem } from "../../types/product.js";
+import type { ShippingConfig } from "../../types/shipping.js";
 import { Helpers } from "../../utils/helpers.js";
 
 export class CartManager {
@@ -10,6 +11,7 @@ export class CartManager {
   private totalPriceEl: HTMLElement | null;
   private checkoutBtn: HTMLButtonElement | null;
   private fullProductInfo: CartItem[] = [];
+  private shippingConfig: ShippingConfig | null = null;
 
   constructor() {
     this.cartItemsContainer = document.getElementById("cart-items-container");
@@ -23,6 +25,9 @@ export class CartManager {
    * Initialize the cart page
    */
   async initialize() {
+    // Load shipping config first
+    await this.loadShippingConfig();
+
     const cart: LocalStorageCartItem[] = JSON.parse(
       localStorage.getItem("cart") || "[]"
     );
@@ -61,6 +66,50 @@ export class CartManager {
       console.error("Failed to fetch cart products:", error);
       this.displayError("Không thể tải giỏ hàng. Vui lòng thử lại.");
     }
+  }
+
+  /**
+   * Load shipping configuration from API
+   */
+  private async loadShippingConfig() {
+    try {
+      const response = await fetch("/api/shipping/config");
+      const result = await response.json();
+
+      if (result.success) {
+        this.shippingConfig = result.data;
+      } else {
+        console.error("Failed to load shipping config:", result.message);
+        // Set default values if API fails
+        this.shippingConfig = {
+          freeShippingThreshold: 150000,
+          standardShippingFee: 15000,
+        };
+      }
+    } catch (error) {
+      console.error("Error loading shipping config:", error);
+      // Set default values if API fails
+      this.shippingConfig = {
+        freeShippingThreshold: 150000,
+        standardShippingFee: 15000,
+      };
+    }
+  }
+
+  /**
+   * Calculate shipping fee based on subtotal
+   */
+  private calculateShippingFee(subtotal: number): number {
+    if (!this.shippingConfig) return 0;
+
+    const { freeShippingThreshold, standardShippingFee } = this.shippingConfig;
+
+    // Free shipping if subtotal meets threshold
+    if (subtotal >= freeShippingThreshold && freeShippingThreshold > 0) {
+      return 0;
+    }
+
+    return standardShippingFee;
   }
 
   /**
@@ -222,12 +271,17 @@ export class CartManager {
       (sum, p) => sum + parseFloat(p.price) * p.quantity,
       0
     );
-    const shipping = 0; // Fixed for now
+    const shipping = this.calculateShippingFee(subtotal);
 
     if (this.subtotalEl)
       this.subtotalEl.textContent = `${subtotal.toLocaleString("vi-VN")} ₫`;
-    if (this.shippingFeeEl)
-      this.shippingFeeEl.textContent = `${shipping.toLocaleString("vi-VN")} ₫`;
+    if (this.shippingFeeEl) {
+      if (shipping === 0 && subtotal > 0 && this.shippingConfig) {
+        this.shippingFeeEl.innerHTML = `<span class="text-success">Miễn phí</span>`;
+      } else {
+        this.shippingFeeEl.textContent = `${shipping.toLocaleString("vi-VN")} ₫`;
+      }
+    }
     if (this.totalPriceEl)
       this.totalPriceEl.textContent = `${(subtotal + shipping).toLocaleString(
         "vi-VN"

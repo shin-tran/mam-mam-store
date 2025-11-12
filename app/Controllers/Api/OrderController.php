@@ -4,6 +4,7 @@ namespace App\Controllers\Api;
 use App\Helpers\Helpers;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\ShippingConfig;
 use Exception;
 
 class OrderController {
@@ -134,11 +135,29 @@ class OrderController {
         ];
       }
 
+      // Calculate shipping fee
+      $shippingConfigModel = new ShippingConfig();
+      $subtotal = $totalAmount; // Tổng trước khi tính shiping fee
+      $shippingFee = $shippingConfigModel->calculateShippingFee($subtotal);
+      $totalAmount = $subtotal + $shippingFee; // Tổng sau khi tính shiping fee
+
       $orderModel = new Order();
-      $orderId = $orderModel->createOrder($userId, $validatedCartItems, $shippingInfo, $totalAmount);
+      $orderId = $orderModel->createOrder(
+        $userId,
+        $validatedCartItems,
+        $shippingInfo,
+        $subtotal,
+        $shippingFee,
+        $totalAmount
+      );
 
       if ($orderId) {
-        Helpers::sendJsonResponse(true, 'Đặt hàng thành công!', ['orderId' => $orderId], 201);
+        Helpers::sendJsonResponse(
+          true,
+          'Đặt hàng thành công!',
+          ['orderId' => $orderId],
+          201
+        );
       } else {
         throw new Exception('Không thể tạo đơn hàng do lỗi hệ thống.');
       }

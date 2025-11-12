@@ -41,12 +41,14 @@ class Order {
     );
   }
 
-  public function createOrder(int $userId, array $cartItems, array $shippingInfo, float $totalAmount) {
+  public function createOrder(int $userId, array $cartItems, array $shippingInfo, float $subtotal, float $shippingFee, float $totalAmount) {
     $this->db->beginTransaction();
     try {
       // 1. Chèn vào bảng orders
       $orderData = [
         'user_id' => $userId,
+        'subtotal' => $subtotal,
+        'shipping_fee' => $shippingFee,
         'total_amount' => $totalAmount,
         'shipping_address' => $shippingInfo['address'],
         'shipping_phone' => $shippingInfo['phone'],

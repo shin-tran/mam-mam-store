@@ -1,0 +1,63 @@
+name: Build and Deploy to FTP
+
+on:
+  push:
+    branches:
+      - main  # Chỉ chạy khi push lên nhánh 'main'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest # Chạy trên máy ảo Ubuntu
+
+    steps:
+    - name: 1. Checkout Code
+      uses: actions/checkout@v4 # Lấy code từ repo về
+
+    # --- Bước 2: Cài đặt môi trường PHP ---
+    - name: 2. Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2.12' # Chọn phiên bản PHP của bạn
+        extensions: mbstring, pdo_mysql, intl # Thêm các extension cần thiết
+        tools: composer
+
+    - name: 3. Install Composer Dependencies
+      run: composer install --no-dev --optimize-autoloader
+
+    # --- Bước 4: Cài đặt môi trường Node/Bun ---
+    - name: 4. Setup Bun
+      uses: oven-sh/setup-bun@v1
+
+    - name: 5. Install Node Dependencies
+      run: bun install
+
+    - name: 6. Build Frontend Assets
+      run: bun run build
+
+    # --- Bước 7: Deploy qua FTP ---
+    - name: 7. FTP Deploy
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./  # Thư mục gốc của code đã build
+        server-dir: /htdocs/   # Thư mục trên hosting
+        exclude: |   # Loại trừ các tệp/thư mục không cần deploy
+          .git*
+          .github*
+          .vscode*
+          node_modules*
+          database*
+          resources/ts*
+          resources/css*
+          README.md
+          VALIDATOR_USAGE.md
+          virtual-host-setup.md
+          package.json
+          package-lock.json
+          composer.json
+          composer.lock
+          tsconfig.json
+          .env
+          .env.example
