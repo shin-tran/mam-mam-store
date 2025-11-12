@@ -36,8 +36,6 @@
             </td>
             <td>
               <?php echo htmlspecialchars($user['email']); ?>
-              <br />
-              <span class="badge badge-ghost badge-sm"><?php echo htmlspecialchars($user['phone_number'] ?? 'Chưa có SĐT'); ?></span>
             </td>
             <td><?php echo htmlspecialchars($user['role'] ?? 'Chưa có vai trò'); ?></td>
             <td>
@@ -52,7 +50,6 @@
                 class="btn btn-ghost btn-edit"
                 data-user-id="<?php echo $user['id']; ?>"
                 data-user-name="<?php echo htmlspecialchars($user['full_name']); ?>"
-                data-user-phone="<?php echo htmlspecialchars($user['phone_number'] ?? ''); ?>"
                 data-user-address="<?php echo htmlspecialchars($user['address'] ?? ''); ?>"
                 data-user-role="<?php echo htmlspecialchars($user['role'] ?? ''); ?>"
               >Sửa</button>
@@ -98,16 +95,6 @@
             id="edit-full-name"
             class="input input-bordered"
             required
-          />
-        </div>
-
-        <div class="form-control flex justify-between">
-          <label class="label"><span class="label-text">Số điện thoại</span></label>
-          <input
-            type="tel"
-            name="phone_number"
-            id="edit-phone-number"
-            class="input input-bordered"
           />
         </div>
 

@@ -46,8 +46,7 @@ class UserController {
     }
 
     $validator = Validator::make($_POST);
-    $validator->required('full_name', 'Họ tên không được để trống.')
-      ->phone('phone_number');
+    $validator->required('full_name', 'Họ tên không được để trống.');
 
     if ($validator->fails()) {
       Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', $validator->getErrors(), 422);
@@ -103,8 +102,7 @@ class UserController {
     $userId = $userData->data->userId;
 
     $validator = Validator::make($_POST);
-    $validator->required('full_name', 'Họ tên không được để trống.')
-      ->phone('phone_number');
+    $validator->required('full_name', 'Họ tên không được để trống.');
 
     if ($validator->fails()) {
       Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', $validator->getErrors(), 422);
@@ -125,8 +123,7 @@ class UserController {
     $postData = $_POST;
 
     $validator = Validator::make($_POST);
-    $validator->required('full_name', 'Họ tên không được để trống.')
-      ->phone('phone_number');
+    $validator->required('full_name', 'Họ tên không được để trống.');
 
     if ($validator->fails()) {
       Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', $validator->getErrors(), 422);
@@ -139,9 +136,6 @@ class UserController {
       // Cập nhật session nếu cần
       if (!empty($_SESSION['user'])) {
         $_SESSION['user']['full_name'] = $postData['full_name'];
-        if (isset($postData['phone_number'])) {
-          $_SESSION['user']['phone_number'] = $postData['phone_number'];
-        }
         if (isset($postData['address'])) {
           $_SESSION['user']['address'] = $postData['address'];
         }
