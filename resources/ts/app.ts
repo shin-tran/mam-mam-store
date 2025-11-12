@@ -1,4 +1,4 @@
 export const AppConfig = {
-  BASE_URL: "http://mammamstore.local",
-  PROJECT_NAME: "/mam-mam-store"
+  // Tự động lấy từ URL hiện tại không bao gồm path
+  BASE_URL: window.location.origin,
 };
