@@ -29,34 +29,51 @@
                     class="select select-bordered select-sm status-select"
                     data-order-id="<?php echo $order['id']; ?>"
                     data-current-status="<?php echo $order['status']; ?>"
+                    <?php echo in_array($order['status'], ['completed', 'cancelled']) ? 'disabled' : ''; ?>
                   >
-                    <option
-                      value="pending"
-                      <?php echo $order['status'] === 'pending' ? 'selected' : ''; ?>
-                    >Đang xử lý</option>
-                    <option
-                      value="packing"
-                      <?php echo $order['status'] === 'packing' ? 'selected' : ''; ?>
-                    >Đang đóng gói</option>
-                    <option
-                      value="shipping"
-                      <?php echo $order['status'] === 'shipping' ? 'selected' : ''; ?>
-                    >Đang giao</option>
-                    <option
-                      value="completed"
-                      <?php echo $order['status'] === 'completed' ? 'selected' : ''; ?>
-                    >Hoàn thành</option>
-                    <option
-                      value="cancelled"
-                      <?php echo $order['status'] === 'cancelled' ? 'selected' : ''; ?>
-                    >Đã hủy</option>
+                    <?php
+                    // Define valid transitions based on current status
+                    $validTransitions = [
+                      'pending' => [
+                        'pending' => 'Đang xử lý',
+                        'packing' => 'Đang đóng gói',
+                        'cancelled' => 'Hủy đơn'
+                      ],
+                      'packing' => [
+                        'packing' => 'Đang đóng gói',
+                        'shipping' => 'Đang giao',
+                        'cancelled' => 'Hủy đơn'
+                      ],
+                      'shipping' => [
+                        'shipping' => 'Đang giao',
+                        'completed' => 'Hoàn thành',
+                        'cancelled' => 'Hủy đơn'
+                      ],
+                      'completed' => [
+                        'completed' => 'Hoàn thành'
+                      ],
+                      'cancelled' => [
+                        'cancelled' => 'Đã hủy'
+                      ]
+                    ];
+
+                    $currentStatus = $order['status'];
+                    $availableStatuses = $validTransitions[$currentStatus] ?? [];
+
+                    foreach ($availableStatuses as $statusValue => $statusLabel):
+                      ?>
+                      <option
+                        value="<?php echo $statusValue; ?>"
+                        <?php echo $order['status'] === $statusValue ? 'selected' : ''; ?>
+                      ><?php echo $statusLabel; ?></option>
+                    <?php endforeach; ?>
                   </select>
                   <?php if ($order['status'] === 'cancelled' && !empty($order['cancellation_reason'])): ?>
                     <div
                       class="tooltip tooltip-left"
                       data-tip="<?php echo htmlspecialchars($order['cancellation_reason']); ?>"
                     >
-                    <!-- INFO icon -->
+                      <!-- INFO icon -->
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         class="h-4 w-4 inline-block ml-1 cursor-help text-error"

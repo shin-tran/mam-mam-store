@@ -54,8 +54,25 @@ ordersTable?.addEventListener("change", async (e) => {
         if (orderIdInput) orderIdInput.value = orderId;
         cancelOrderForm?.reset();
         cancelModal?.showModal();
-      } else {
-        await updateOrderStatus(orderId, newStatus, target);
+      } else if (newStatus !== currentStatus) {
+        // Confirm status change for other statuses
+        const statusNames: { [key: string]: string } = {
+          pending: "Đang xử lý",
+          packing: "Đang đóng gói",
+          shipping: "Đang giao",
+          completed: "Hoàn thành",
+          cancelled: "Đã hủy",
+        };
+
+        const confirmMessage = `Bạn có chắc chắn muốn chuyển đơn hàng sang trạng thái "${statusNames[newStatus]}"?`;
+
+        if (confirm(confirmMessage)) {
+          await updateOrderStatus(orderId, newStatus, target);
+          window.location.reload();
+        } else {
+          // Reset to original value if cancelled
+          target.value = currentStatus as string;
+        }
       }
     }
   }

@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\ShippingConfig;
 use Exception;
+use function in_array;
 
 class OrderController {
   public function getDetails($orderId) {
@@ -37,6 +38,24 @@ class OrderController {
       return;
     }
 
+    $orderModel = new Order();
+
+    // Get current order status
+    $order = $orderModel->getOrderById($orderId);
+    if (!$order) {
+      Helpers::sendJsonResponse(false, 'Đơn hàng không tồn tại.', null, 404);
+      return;
+    }
+
+    $currentStatus = $order['status'];
+
+    // Validate status transition
+    $validationResult = $this->validateStatusTransition($currentStatus, $status);
+    if (!$validationResult['valid']) {
+      Helpers::sendJsonResponse(false, $validationResult['message'], null, 400);
+      return;
+    }
+
     // If status is cancelled, require cancellation reason
     if ($status === 'cancelled') {
       if (empty($cancellationReason)) {
@@ -52,7 +71,6 @@ class OrderController {
       }
     }
 
-    $orderModel = new Order();
     $updateData = [
       'status' => $status
     ];
@@ -67,10 +85,71 @@ class OrderController {
     $isSuccess = $orderModel->updateStatus($orderId, $updateData);
 
     if ($isSuccess) {
+      // Restore stock if order is cancelled
+      if ($status === 'cancelled' && $currentStatus !== 'cancelled') {
+        $orderModel->restoreProductStock($orderId);
+      }
+
       Helpers::sendJsonResponse(true, 'Cập nhật trạng thái đơn hàng thành công.');
     } else {
       Helpers::sendJsonResponse(false, 'Cập nhật trạng thái thất bại.', null, 400);
     }
+  }
+
+  /**
+   * Validate if status transition is allowed
+   * @param string $currentStatus Current order status
+   * @param string $newStatus New status to change to
+   * @return array ['valid' => bool, 'message' => string]
+   */
+  private function validateStatusTransition($currentStatus, $newStatus) {
+    // If status is the same, no need to update
+    if ($currentStatus === $newStatus) {
+      return ['valid' => false, 'message' => 'Trạng thái mới giống với trạng thái hiện tại.'];
+    }
+
+    // Define valid transitions for each status
+    $validTransitions = [
+      'pending' => ['packing', 'cancelled'],
+      'packing' => ['shipping', 'cancelled'],
+      'shipping' => ['completed', 'cancelled'],
+      'completed' => [], // Cannot change from completed
+      'cancelled' => []  // Cannot change from cancelled
+    ];
+
+    // Check if transition is valid
+    if (!isset($validTransitions[$currentStatus])) {
+      return ['valid' => false, 'message' => 'Trạng thái hiện tại không hợp lệ.'];
+    }
+
+    // Check if status transition is not valid
+    if (!in_array($newStatus, $validTransitions[$currentStatus])) {
+      $statusNames = [
+        'pending' => 'Đang xử lý',
+        'packing' => 'Đang đóng gói',
+        'shipping' => 'Đang giao',
+        'completed' => 'Hoàn thành',
+        'cancelled' => 'Đã hủy'
+      ];
+
+      $currentName = $statusNames[$currentStatus] ?? $currentStatus;
+      $newName = $statusNames[$newStatus] ?? $newStatus;
+
+      if ($currentStatus === 'completed') {
+        return ['valid' => false, 'message' => 'Không thể thay đổi trạng thái của đơn hàng đã hoàn thành.'];
+      }
+
+      if ($currentStatus === 'cancelled') {
+        return ['valid' => false, 'message' => 'Không thể thay đổi trạng thái của đơn hàng đã hủy.'];
+      }
+
+      return [
+        'valid' => false,
+        'message' => "Không thể chuyển từ '{$currentName}' sang '{$newName}'. Vui lòng tuân theo quy trình đơn hàng."
+      ];
+    }
+
+    return ['valid' => true, 'message' => ''];
   }
 
   public function create($userData) {
