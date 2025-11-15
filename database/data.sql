@@ -1,11 +1,3 @@
--- Xóa dữ liệu cũ trong bảng products và categories để tránh trùng lặp
-DELETE FROM `products`;
-DELETE FROM `categories`;
-
--- Reset auto-increment cho bảng categories và products
-ALTER TABLE `categories` AUTO_INCREMENT = 1;
-ALTER TABLE `products` AUTO_INCREMENT = 1;
-
 INSERT INTO `roles` (`name`, `description`) VALUES
 ('admin', 'Người quản trị cao nhất, có toàn quyền hệ thống.'),
 ('customer', 'Khách hàng.');
@@ -77,6 +69,3 @@ VALUES
     '25000',
     'Phí vận chuyển tiêu chuẩn (VND) nếu không đủ điều kiện miễn phí.'
   );
-
--- NOTE: TEST DATA DO NOT RUN THIS
-INSERT INTO `role_user` (`user_id`, `role_id`) VALUES (1, 1);
