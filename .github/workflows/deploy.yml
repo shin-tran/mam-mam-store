@@ -50,7 +50,6 @@ jobs:
           **/resources/**
           README.md
           VALIDATOR_USAGE.md
-          virtual-host-setup.md
           package.json
           package-lock.json
           composer.json
