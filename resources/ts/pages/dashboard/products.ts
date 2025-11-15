@@ -246,7 +246,7 @@ async function handleEditSubmit(e: SubmitEvent) {
     if (result.success) {
       toastManager.createToast({ message: result.message, type: "success" });
       editProductModal.close();
-      setTimeout(() => window.location.reload(), 1500);
+      window.location.reload()
     } else {
       toastManager.createToast({
         message: result.message || "Cập nhật thất bại.",

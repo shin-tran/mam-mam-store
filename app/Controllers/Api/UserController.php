@@ -6,6 +6,7 @@ use App\Helpers\Validator;
 use App\Models\User;
 use App\Models\UserAddress;
 use Exception;
+use function intval;
 
 class UserController {
 

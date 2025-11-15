@@ -187,7 +187,7 @@ async function updateOrderStatus(
 
       // If cancelled, reload to show the info icon
       if (status === "cancelled") {
-        setTimeout(() => window.location.reload(), 1000);
+        window.location.reload()
       }
     } else {
       toastManager.createToast({

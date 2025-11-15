@@ -262,7 +262,7 @@ async function handleCancelOrder(e: SubmitEvent) {
       });
       cancelOrderModal?.close();
       cancelOrderForm.reset();
-      setTimeout(() => window.location.reload(), 1000);
+      window.location.reload()
     } else {
       toastManager.createToast({
         message: result.message || "Không thể hủy đơn hàng",

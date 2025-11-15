@@ -14,16 +14,22 @@ const editUserForm = document.getElementById(
 const editUserIdInput = document.getElementById(
   "edit-user-id"
 ) as HTMLInputElement;
-const editRoleInput = document.getElementById("edit-role");
+const editRoleInput = document.getElementById("edit-role") as HTMLSelectElement;
 const editFullNameInput = document.getElementById(
   "edit-full-name"
 ) as HTMLInputElement;
-const editPhoneNumberInput = document.getElementById(
-  "edit-phone-number"
+const editEmailInput = document.getElementById(
+  "edit-email"
 ) as HTMLInputElement;
-const editAddressTextarea = document.getElementById(
-  "edit-address"
-) as HTMLTextAreaElement;
+const editIsActivatedInput = document.getElementById(
+  "edit-is-activated"
+) as HTMLSelectElement;
+const editNewPasswordInput = document.getElementById(
+  "edit-new-password"
+) as HTMLInputElement;
+const editConfirmPasswordInput = document.getElementById(
+  "edit-confirm-password"
+) as HTMLInputElement;
 
 // Delete Modal Elements
 const deleteUserModal = document.getElementById(
@@ -52,18 +58,31 @@ editUserForm?.addEventListener("submit", handleEditFormSubmit);
 function handleEditButtonClick(button: Element) {
   userIdToEdit = button.getAttribute("data-user-id");
   const userName = button.getAttribute("data-user-name");
-  const userPhone = button.getAttribute("data-user-phone") || "";
-  const userAddress = button.getAttribute("data-user-address") || "";
+  const userEmail = button.getAttribute("data-user-email");
+  const userRole = button.getAttribute("data-user-role");
+  const userActivated = button.getAttribute("data-user-activated");
 
-  // Không thực hiện khi không có những thứ sau
-  if (!userIdToEdit || !editUserModal || !editUserIdInput || !editRoleInput)
-    return;
+  if (!userIdToEdit || !editUserModal) return;
 
   // Điền thông tin vào modal
-  editUserIdInput.value = userIdToEdit;
-  editFullNameInput.value = userName || "";
-  editPhoneNumberInput.value = userPhone;
-  editAddressTextarea.value = userAddress;
+  if (editUserIdInput) editUserIdInput.value = userIdToEdit;
+  if (editFullNameInput) editFullNameInput.value = userName || "";
+  if (editEmailInput) editEmailInput.value = userEmail || "";
+  if (editIsActivatedInput) editIsActivatedInput.value = userActivated || "1";
+
+  // Set role select
+  if (editRoleInput && userRole) {
+    const roleOptions = editRoleInput.querySelectorAll("option");
+    roleOptions.forEach((option) => {
+      if (option.textContent?.toLowerCase().trim() === userRole.toLowerCase()) {
+        option.selected = true;
+      }
+    });
+  }
+
+  // Clear password fields
+  if (editNewPasswordInput) editNewPasswordInput.value = "";
+  if (editConfirmPasswordInput) editConfirmPasswordInput.value = "";
 
   editUserModal.showModal();
 }
@@ -71,6 +90,28 @@ function handleEditButtonClick(button: Element) {
 async function handleEditFormSubmit(event: SubmitEvent) {
   event.preventDefault();
   if (!userIdToEdit) return;
+
+  // Validate password fields
+  const newPassword = editNewPasswordInput?.value || "";
+  const confirmPassword = editConfirmPasswordInput?.value || "";
+
+  if (newPassword || confirmPassword) {
+    if (newPassword.length < 6) {
+      toastManager.createToast({
+        message: "Mật khẩu phải có ít nhất 6 ký tự!",
+        type: "error",
+      });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toastManager.createToast({
+        message: "Mật khẩu xác nhận không khớp!",
+        type: "error",
+      });
+      return;
+    }
+  }
 
   const submitButton = (
     event.target as HTMLFormElement
@@ -81,6 +122,12 @@ async function handleEditFormSubmit(event: SubmitEvent) {
   }
 
   const formData = new FormData(editUserForm);
+
+  // Remove password fields if empty
+  if (!newPassword) {
+    formData.delete("new_password");
+    formData.delete("confirm_password");
+  }
 
   try {
     const response = await authService.fetchWithAuth(
@@ -93,7 +140,11 @@ async function handleEditFormSubmit(event: SubmitEvent) {
     const result = await response.json();
 
     if (result.success) {
-      window.location.reload();
+      toastManager.createToast({
+        message: "Cập nhật người dùng thành công!",
+        type: "success",
+      });
+      window.location.reload()
     } else {
       toastManager.createToast({ message: result.message, type: "error" });
     }
