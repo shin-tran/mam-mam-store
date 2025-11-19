@@ -16,7 +16,7 @@ class SanitizeInputMiddleware {
     // duyệt các mảng lồng nhau (nested arrays)
     array_walk_recursive($array, function (&$value) {
       if (is_string($value)) {
-        $value = trim(filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS));
+        $value = trim($value);
       }
     });
 
