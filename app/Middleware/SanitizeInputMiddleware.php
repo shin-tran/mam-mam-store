@@ -1,6 +1,8 @@
 <?php
 namespace App\Middleware;
 
+use function is_string;
+
 class SanitizeInputMiddleware {
   public static function handle() {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
