@@ -79,29 +79,6 @@ class Validator {
   }
 
   /**
-   * Validate email or phone
-   */
-  public function emailOrPhone(string $field, ?string $message = null): self {
-    if (isset($this->data[$field]) && !empty($this->data[$field])) {
-      $value = $this->data[$field];
-      $isValid = false;
-
-      if (is_numeric($value)) {
-        $isValid = Helpers::isPhone($value);
-        if (!$isValid) {
-          $this->errors[$field][] = $message ?? "Số điện thoại không hợp lệ!";
-        }
-      } else {
-        $isValid = Helpers::validateEmail($value);
-        if (!$isValid) {
-          $this->errors[$field][] = $message ?? "Email không hợp lệ!";
-        }
-      }
-    }
-    return $this;
-  }
-
-  /**
    * Validate field matches another field
    */
   public function matches(string $field, string $matchField, ?string $message = null): self {

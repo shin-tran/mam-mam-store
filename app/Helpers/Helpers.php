@@ -7,6 +7,9 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
+use function in_array;
+use function is_array;
+
 class Helpers {
   public static function isPost() {
     return $_SERVER["REQUEST_METHOD"] === 'POST';
@@ -16,47 +19,9 @@ class Helpers {
     return $_SERVER["REQUEST_METHOD"] === 'GET';
   }
 
-  public static function filterData($method = '') {
-    $filterArr = [];
-    $inputData = [];
-
-    $requestMethod = strtoupper($_SERVER['REQUEST_METHOD']);
-    $method = empty($method) ? $requestMethod : strtoupper($method);
-
-    if ($method === 'GET') {
-      $inputData = $_GET;
-    } else if ($method === 'POST') {
-      $inputData = $_POST;
-    }
-
-    if (!empty($inputData)) {
-      foreach ($inputData as $key => $value) {
-        // loại bỏ các thẻ HTML, XML và PHP
-        $cleanKey = strip_tags($key);
-        if (is_array($value)) {
-          $sanitizedValue = [];
-          foreach ($value as $k => $v) {
-            $sanitizedValue[strip_tags($k)] = trim(filter_var($v, FILTER_SANITIZE_SPECIAL_CHARS));
-          }
-          $filterArr[$cleanKey] = $sanitizedValue;
-        } else {
-          $filterArr[$cleanKey] = trim(filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS));
-        }
-      }
-    }
-    return $filterArr;
-  }
-
   public static function validateEmail($email) {
     if (!empty($email)) {
       return filter_var($email, FILTER_VALIDATE_EMAIL);
-    }
-    return false;
-  }
-
-  public static function validateInt($number) {
-    if (!empty($number)) {
-      return filter_var($number, FILTER_VALIDATE_INT);
     }
     return false;
   }
@@ -68,10 +33,6 @@ class Helpers {
     }
     $regex = '/^(0)(3[2-9]|5[6|8|9]|7[0|6-9]|8[1-6|8|9]|9[0-4|6-9])[0-9]{7}$/';
     return preg_match($regex, $phone) > 0;
-  }
-
-  public static function getMsg($msg, $type) {
-    echo "<div class=\"alert alert-{$type}\" role=\"alert\">{$msg}</div>";
   }
 
   public static function sendMail($emailTo, $subject, $content) {
