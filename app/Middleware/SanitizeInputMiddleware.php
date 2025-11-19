@@ -23,6 +23,7 @@ class SanitizeInputMiddleware {
     // xử lý key vì array_walk_recursive không giúp xử lý key
     $sanitizedArray = [];
     foreach ($array as $key => $value) {
+      // Loại bỏ hoàn toàn các thẻ HTML khỏi key
       $cleanKey = strip_tags($key);
       $sanitizedArray[$cleanKey] = $value;
     }
