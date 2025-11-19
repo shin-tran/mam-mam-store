@@ -2,12 +2,13 @@
 namespace App\Middleware;
 
 use App\Helpers\Helpers;
+use function in_array;
 
 class PermissionMiddleware {
   public static function handle(object $userData, string $requiredPermission) {
     $userRoles = $userData->data->role ?? [];
 
-    // admin truy cập mọi chức năng
+    // Admin truy cập mọi chức năng
     if (in_array('admin', $userRoles))
       return;
 
