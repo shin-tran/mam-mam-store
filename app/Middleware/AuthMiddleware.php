@@ -10,11 +10,6 @@ use Firebase\JWT\SignatureInvalidException;
 
 class AuthMiddleware {
   public static function handle() {
-    /**
-     * kiểm tra có phải api request hay không
-     * nếu có gọi handleApiAuth()
-     * nếu không sẽ logout user
-     */
     if (self::isApiRequest()) {
       return self::handleApiAuth();
     } else {
@@ -25,15 +20,19 @@ class AuthMiddleware {
 
   private static function handleApiAuth() {
     $authHeader = $_SERVER['REDIRECT_REDIRECT_HTTP_AUTHORIZATION'] ?? null;
-    // kiểm tra có access token hay không
+
+    // Kiểm tra định dạng "Bearer <token>"
     if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
       Helpers::sendJsonResponse(false, 'Yêu cầu thiếu hoặc sai định dạng token.', null, 401);
     }
 
     $token = $matches[1];
+
+    // Giải mã và kiểm tra Token (JWT)
     try {
-      // decode access token
       $secretKey = $_ENV['ACCESS_TOKEN_SECRET'];
+
+      // Trả về thông tin user
       return JWT::decode($token, new Key($secretKey, 'HS256'));
     } catch (ExpiredException $e) {
       Helpers::sendJsonResponse(false, 'Token đã hết hạn.', ['code' => 'TOKEN_EXPIRED'], 401);
