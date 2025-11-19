@@ -50,9 +50,9 @@ class AuthMiddleware {
     }
   }
 
-  private static function isApiRequest(): bool {
+  private static function isApiRequest() {
     $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     return strpos($requestUri, '/api/') === 0 ||
-      (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false);
+      isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false;
   }
 }

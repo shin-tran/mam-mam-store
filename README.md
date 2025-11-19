@@ -69,7 +69,7 @@ bun install
 
 ### Bước 3: Cấu hình Database
 
-Lưu ý: Nếu bạn làm theo cách này thì hay vào database/schema.sql và xoá 7 dòng đầu đi.
+Lưu ý: Nếu bạn làm theo cách này thì hay vào `database/schema.sql` và xoá 7 dòng đầu đi.
 
 #### 3.1. Tạo database MySQL
 
