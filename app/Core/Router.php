@@ -5,6 +5,8 @@ use App\Middleware\AuthMiddleware;
 use App\Middleware\GuestMiddleware;
 use App\Middleware\PermissionMiddleware;
 use App\Middleware\SanitizeInputMiddleware;
+use function array_slice;
+use function call_user_func_array;
 
 class Router {
   protected $routes = [
@@ -96,7 +98,7 @@ class Router {
 
           // Gọi phương thức của controller và truyền các tham số đã trích xuất từ URI
           // cùng với dữ liệu người dùng từ middleware (nếu có).
-          $allParams = array_merge($params, [$userData]);
+          $allParams = [...$params, $userData];
           call_user_func_array([$controller, $methodName], $allParams);
           return;
         }

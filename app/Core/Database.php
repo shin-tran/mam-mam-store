@@ -2,6 +2,7 @@
 namespace App\Core;
 
 use PDO, Exception, PDOException, PDOStatement;
+use function sprintf;
 
 class Database {
   private $connect;
@@ -15,8 +16,19 @@ class Database {
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
       ];
       $dsn_template = "%s:host=%s;port=%s;dbname=%s";
-      $dsn = sprintf($dsn_template, $_ENV["DB_DRIVER"], $_ENV["DB_HOST"], $_ENV["DB_PORT"], $_ENV["DB_DB"]);
-      $this->connect = new PDO($dsn, $_ENV["DB_USER"], $_ENV["DB_PASS"], $options);
+      $dsn = sprintf(
+        $dsn_template,
+        $_ENV["DB_DRIVER"],
+        $_ENV["DB_HOST"],
+        $_ENV["DB_PORT"],
+        $_ENV["DB_DB"]
+      );
+      $this->connect = new PDO(
+        $dsn,
+        $_ENV["DB_USER"],
+        $_ENV["DB_PASS"],
+        $options
+      );
       $this->connect->exec("SET time_zone = '+07:00'");
     } catch (Exception $ex) {
       $this->writeErrorLog($ex);
@@ -118,7 +130,7 @@ class Database {
 
     try {
       $stm = $this->connect->prepare($sql);
-      $all_params = array_merge($data, $params_condition);
+      $all_params = [...$data, ...$params_condition];
       return $stm->execute($all_params);
     } catch (PDOException $ex) {
       $this->writeErrorLog($ex);
