@@ -4,30 +4,51 @@ namespace App\Controllers\Api;
 use App\Helpers\Helpers;
 use App\Models\Category;
 use Exception;
+use function intval;
 
 class CategoryController {
   public function create() {
     $categoryName = $_POST['category_name'] ?? '';
 
     if (empty($categoryName)) {
-      Helpers::sendJsonResponse(false, 'Tên danh mục không được để trống.', null, 422);
+      Helpers::sendJsonResponse(
+        false,
+        'Tên danh mục không được để trống.',
+        null,
+        422
+      );
     }
 
     $categoryModel = new Category();
     if ($categoryModel->categoryNameExists($categoryName)) {
-      Helpers::sendJsonResponse(false, 'Tên danh mục này đã tồn tại.', null, 409);
+      Helpers::sendJsonResponse(
+        false,
+        'Tên danh mục này đã tồn tại.',
+        null,
+        409
+      );
     }
 
     try {
       $categoryId = $categoryModel->createCategory($categoryName);
       if ($categoryId) {
-        Helpers::sendJsonResponse(true, 'Thêm danh mục thành công.', ['id' => $categoryId], 201);
+        Helpers::sendJsonResponse(
+          true,
+          'Thêm danh mục thành công.',
+          ['id' => $categoryId],
+          201
+        );
       } else {
         throw new Exception("Không thể tạo danh mục.");
       }
     } catch (Exception $e) {
       error_log("Category creation error: ".$e->getMessage());
-      Helpers::sendJsonResponse(false, 'Thêm danh mục thất bại do lỗi hệ thống.', null, 500);
+      Helpers::sendJsonResponse(
+        false,
+        'Thêm danh mục thất bại do lỗi hệ thống.',
+        null,
+        500
+      );
     }
   }
 
@@ -36,7 +57,12 @@ class CategoryController {
     $categoryName = $_POST['category_name'] ?? '';
 
     if (empty($categoryName)) {
-      Helpers::sendJsonResponse(false, 'Tên danh mục không được để trống.', null, 422);
+      Helpers::sendJsonResponse(
+        false,
+        'Tên danh mục không được để trống.',
+        null,
+        422
+      );
     }
 
     $categoryModel = new Category();
@@ -47,7 +73,12 @@ class CategoryController {
     // Kiểm tra xem tên mới có bị trùng với tên của một danh mục khác không
     $existingCategory = $categoryModel->categoryNameExists($categoryName);
     if ($existingCategory && $existingCategory['id'] != $idToUpdate) {
-        Helpers::sendJsonResponse(false, 'Tên danh mục này đã tồn tại.', null, 409);
+      Helpers::sendJsonResponse(
+        false,
+        'Tên danh mục này đã tồn tại.',
+        null,
+        409
+      );
     }
 
     try {
@@ -59,7 +90,12 @@ class CategoryController {
       }
     } catch (Exception $e) {
       error_log("Category update error: ".$e->getMessage());
-      Helpers::sendJsonResponse(false, 'Cập nhật danh mục thất bại do lỗi hệ thống.', null, 500);
+      Helpers::sendJsonResponse(
+        false,
+        'Cập nhật danh mục thất bại do lỗi hệ thống.',
+        null,
+        500
+      );
     }
   }
 
@@ -71,9 +107,14 @@ class CategoryController {
       Helpers::sendJsonResponse(false, 'Danh mục không tồn tại.', null, 404);
     }
 
-    // (Tùy chọn) Kiểm tra xem danh mục có đang được sử dụng bởi sản phẩm nào không
+    // Kiểm tra xem danh mục có đang được sử dụng bởi sản phẩm nào không
     if ($categoryModel->isCategoryInUse($idToDelete)) {
-      Helpers::sendJsonResponse(false, 'Không thể xóa danh mục đang có sản phẩm.', null, 400);
+      Helpers::sendJsonResponse(
+        false,
+        'Không thể xóa danh mục đang có sản phẩm.',
+        null,
+        400
+      );
     }
 
     try {
@@ -85,7 +126,12 @@ class CategoryController {
       }
     } catch (Exception $e) {
       error_log("Category delete error: ".$e->getMessage());
-      Helpers::sendJsonResponse(false, 'Xóa danh mục thất bại do lỗi hệ thống.', null, 500);
+      Helpers::sendJsonResponse(
+        false,
+        'Xóa danh mục thất bại do lỗi hệ thống.',
+        null,
+        500
+      );
     }
   }
 }

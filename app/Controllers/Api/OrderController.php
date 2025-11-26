@@ -14,9 +14,18 @@ class OrderController {
     $details = $orderModel->getOrderDetailsById($orderId);
 
     if ($details !== false) {
-      Helpers::sendJsonResponse(true, 'Lấy chi tiết đơn hàng thành công.', $details);
+      Helpers::sendJsonResponse(
+        true,
+        'Lấy chi tiết đơn hàng thành công.',
+        $details
+      );
     } else {
-      Helpers::sendJsonResponse(false, 'Không thể lấy chi tiết đơn hàng.', null, 500);
+      Helpers::sendJsonResponse(
+        false,
+        'Không thể lấy chi tiết đơn hàng.',
+        null,
+        500
+      );
     }
   }
 
@@ -27,12 +36,23 @@ class OrderController {
 
     // Validation
     if (empty($status)) {
-      Helpers::sendJsonResponse(false, 'Trạng thái không được để trống.', null, 422);
+      Helpers::sendJsonResponse(
+        false,
+        'Trạng thái không được để trống.',
+        null,
+        422
+      );
       return;
     }
 
     // Validate status value
-    $validStatuses = ['pending', 'packing', 'shipping', 'completed', 'cancelled'];
+    $validStatuses = [
+      'pending',
+      'packing',
+      'shipping',
+      'completed',
+      'cancelled'
+    ];
     if (!in_array($status, $validStatuses)) {
       Helpers::sendJsonResponse(false, 'Trạng thái không hợp lệ.', null, 422);
       return;
@@ -59,14 +79,24 @@ class OrderController {
     // If status is cancelled, require cancellation reason
     if ($status === 'cancelled') {
       if (empty($cancellationReason)) {
-        Helpers::sendJsonResponse(false, 'Vui lòng cung cấp lý do hủy đơn hàng.', null, 422);
+        Helpers::sendJsonResponse(
+          false,
+          'Vui lòng cung cấp lý do hủy đơn hàng.',
+          null,
+          422
+        );
         return;
       }
 
       // Validate cancelled_by
       $validCancelledBy = ['customer', 'admin', 'system'];
       if (!in_array($cancelledBy, $validCancelledBy)) {
-        Helpers::sendJsonResponse(false, 'Người hủy đơn không hợp lệ.', null, 422);
+        Helpers::sendJsonResponse(
+          false,
+          'Người hủy đơn không hợp lệ.',
+          null,
+          422
+        );
         return;
       }
     }
@@ -105,7 +135,10 @@ class OrderController {
   private function validateStatusTransition($currentStatus, $newStatus) {
     // If status is the same, no need to update
     if ($currentStatus === $newStatus) {
-      return ['valid' => false, 'message' => 'Trạng thái mới giống với trạng thái hiện tại.'];
+      return [
+        'valid' => false,
+        'message' => 'Trạng thái mới giống với trạng thái hiện tại.'
+      ];
     }
 
     // Define valid transitions for each status
@@ -119,7 +152,10 @@ class OrderController {
 
     // Check if transition is valid
     if (!isset($validTransitions[$currentStatus])) {
-      return ['valid' => false, 'message' => 'Trạng thái hiện tại không hợp lệ.'];
+      return [
+        'valid' => false,
+        'message' => 'Trạng thái hiện tại không hợp lệ.'
+      ];
     }
 
     // Check if status transition is not valid
@@ -136,11 +172,17 @@ class OrderController {
       $newName = $statusNames[$newStatus] ?? $newStatus;
 
       if ($currentStatus === 'completed') {
-        return ['valid' => false, 'message' => 'Không thể thay đổi trạng thái của đơn hàng đã hoàn thành.'];
+        return [
+          'valid' => false,
+          'message' => 'Không thể thay đổi trạng thái của đơn hàng đã hoàn thành.'
+        ];
       }
 
       if ($currentStatus === 'cancelled') {
-        return ['valid' => false, 'message' => 'Không thể thay đổi trạng thái của đơn hàng đã hủy.'];
+        return [
+          'valid' => false,
+          'message' => 'Không thể thay đổi trạng thái của đơn hàng đã hủy.'
+        ];
       }
 
       return [
@@ -165,12 +207,26 @@ class OrderController {
     $shippingInfo = $data['shippingInfo'] ?? [];
 
     // Basic validation
-    if (empty($cartData) || empty($shippingInfo['address']) || empty($shippingInfo['phone'])) {
-      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ. Vui lòng điền đủ thông tin.', null, 422);
+    if (
+      empty($cartData) ||
+      empty($shippingInfo['address']) ||
+      empty($shippingInfo['phone'])
+    ) {
+      Helpers::sendJsonResponse(
+        false,
+        'Dữ liệu không hợp lệ. Vui lòng điền đủ thông tin.',
+        null,
+        422
+      );
       return;
     }
     if (!Helpers::isPhone($shippingInfo['phone'])) {
-      Helpers::sendJsonResponse(false, 'Số điện thoại giao hàng không hợp lệ.', null, 422);
+      Helpers::sendJsonResponse(
+        false,
+        'Số điện thoại giao hàng không hợp lệ.',
+        null,
+        422
+      );
       return;
     }
 
@@ -200,7 +256,9 @@ class OrderController {
         $product = $productsMap[$productId];
 
         if ($product['stock_quantity'] < $quantity) {
-          throw new Exception("Sản phẩm '{$product['product_name']}' không đủ số lượng trong kho.");
+          throw new Exception(
+            "Sản phẩm '{$product['product_name']}' không đủ số lượng trong kho."
+          );
         }
 
         $totalAmount += $product['price'] * $quantity;
@@ -258,7 +316,12 @@ class OrderController {
     $cancellationReason = $data['cancellation_reason'] ?? '';
 
     if (empty($cancellationReason)) {
-      Helpers::sendJsonResponse(false, 'Vui lòng cung cấp lý do hủy đơn hàng.', null, 422);
+      Helpers::sendJsonResponse(
+        false,
+        'Vui lòng cung cấp lý do hủy đơn hàng.',
+        null,
+        422
+      );
       return;
     }
 
@@ -272,13 +335,23 @@ class OrderController {
     }
 
     if ($order['user_id'] != $userId) {
-      Helpers::sendJsonResponse(false, 'Bạn không có quyền hủy đơn hàng này.', null, 403);
+      Helpers::sendJsonResponse(
+        false,
+        'Bạn không có quyền hủy đơn hàng này.',
+        null,
+        403
+      );
       return;
     }
 
     // Only allow cancellation for pending orders
     if ($order['status'] !== 'pending') {
-      Helpers::sendJsonResponse(false, 'Chỉ có thể hủy đơn hàng đang chờ xử lý.', null, 400);
+      Helpers::sendJsonResponse(
+        false,
+        'Chỉ có thể hủy đơn hàng đang chờ xử lý.',
+        null,
+        400
+      );
       return;
     }
 
