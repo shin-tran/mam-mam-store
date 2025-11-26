@@ -2,7 +2,6 @@
 namespace App\Models;
 
 use App\Core\Database;
-use PDOException;
 
 class Product {
   private $db;

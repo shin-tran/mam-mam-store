@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use App\Core\Database;
+use function floatval;
 
 class ShippingConfig {
   private $db;
