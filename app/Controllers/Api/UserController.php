@@ -6,6 +6,7 @@ use App\Helpers\Validator;
 use App\Models\User;
 use App\Models\UserAddress;
 use Exception;
+use function in_array;
 use function intval;
 
 class UserController {
@@ -38,7 +39,12 @@ class UserController {
     }
 
     if ($idToUpdate === $userData->data->userId) {
-      Helpers::sendJsonResponse(false, 'Bạn không thể tự sửa thông tin của chính mình.', null, 403);
+      Helpers::sendJsonResponse(
+        false,
+        'Bạn không thể tự sửa thông tin của chính mình.',
+        null,
+        403
+      );
     }
 
     $userModel = new User();
@@ -50,11 +56,20 @@ class UserController {
     $validator->required('full_name', 'Họ tên không được để trống.');
 
     if ($validator->fails()) {
-      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', $validator->getErrors(), 422);
+      Helpers::sendJsonResponse(
+        false,
+        'Dữ liệu không hợp lệ.',
+        $validator->getErrors(),
+        422
+      );
     }
 
     try {
-      $isUpdated = $userModel->updateUserDetailsAndRole($idToUpdate, $_POST, $role);
+      $isUpdated = $userModel->updateUserDetailsAndRole(
+        $idToUpdate,
+        $_POST,
+        $role
+      );
       if ($isUpdated) {
         Helpers::sendJsonResponse(true, 'Cập nhật thông tin người dùng thành công.');
       } else {
@@ -62,7 +77,12 @@ class UserController {
       }
     } catch (Exception $e) {
       error_log("User update error: ".$e->getMessage());
-      Helpers::sendJsonResponse(false, 'Cập nhật thông tin thất bại do lỗi hệ thống.', null, 500);
+      Helpers::sendJsonResponse(
+        false,
+        'Cập nhật thông tin thất bại do lỗi hệ thống.',
+        null,
+        500
+      );
     }
   }
 
@@ -74,7 +94,12 @@ class UserController {
 
     // Không cho phép người dùng tự xóa chính mình
     if ($idToDelete === $userData->data->userId) {
-      Helpers::sendJsonResponse(false, 'Bạn không thể tự xóa tài khoản của chính mình.', null, 400);
+      Helpers::sendJsonResponse(
+        false,
+        'Bạn không thể tự xóa tài khoản của chính mình.',
+        null,
+        400
+      );
     }
 
     $userModel = new User();
@@ -87,7 +112,12 @@ class UserController {
     // Ngăn chặn việc xóa admin
     $roleOfUserToDelete = $userModel->findRoleUser($idToDelete);
     if (in_array('admin', array_column($roleOfUserToDelete, 'name'))) {
-      Helpers::sendJsonResponse(false, 'Không thể xóa tài khoản admin.', null, 403);
+      Helpers::sendJsonResponse(
+        false,
+        'Không thể xóa tài khoản admin.',
+        null,
+        403
+      );
     }
 
     $isDeleted = $userModel->deleteUser($idToDelete);
@@ -95,7 +125,12 @@ class UserController {
     if ($isDeleted) {
       Helpers::sendJsonResponse(true, 'Đã xóa người dùng thành công.');
     } else {
-      Helpers::sendJsonResponse(false, 'Xóa người dùng thất bại do lỗi hệ thống.', null, 500);
+      Helpers::sendJsonResponse(
+        false,
+        'Xóa người dùng thất bại do lỗi hệ thống.',
+        null,
+        500
+      );
     }
   }
 
@@ -106,7 +141,12 @@ class UserController {
     $validator->required('full_name', 'Họ tên không được để trống.');
 
     if ($validator->fails()) {
-      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', $validator->getErrors(), 422);
+      Helpers::sendJsonResponse(
+        false,
+        'Dữ liệu không hợp lệ.',
+        $validator->getErrors(),
+        422
+      );
     }
 
     $userModel = new User();
@@ -115,7 +155,12 @@ class UserController {
     if ($isUpdated) {
       Helpers::sendJsonResponse(true, 'Cập nhật thông tin thành công.');
     } else {
-      Helpers::sendJsonResponse(false, 'Cập nhật thất bại hoặc không có gì thay đổi.', null, 400);
+      Helpers::sendJsonResponse(
+        false,
+        'Cập nhật thất bại hoặc không có gì thay đổi.',
+        null,
+        400
+      );
     }
   }
 
@@ -127,7 +172,12 @@ class UserController {
     $validator->required('full_name', 'Họ tên không được để trống.');
 
     if ($validator->fails()) {
-      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', $validator->getErrors(), 422);
+      Helpers::sendJsonResponse(
+        false,
+        'Dữ liệu không hợp lệ.',
+        $validator->getErrors(),
+        422
+      );
     }
 
     $userModel = new User();
@@ -143,7 +193,12 @@ class UserController {
       }
       Helpers::sendJsonResponse(true, 'Cập nhật thông tin thành công.');
     } else {
-      Helpers::sendJsonResponse(false, 'Cập nhật thất bại hoặc không có gì thay đổi.', null, 400);
+      Helpers::sendJsonResponse(
+        false,
+        'Cập nhật thất bại hoặc không có gì thay đổi.',
+        null,
+        400
+      );
     }
   }
 
@@ -176,12 +231,22 @@ class UserController {
 
     // Kiểm tra kích thước file
     if ($file["size"] > 2000000) { // 2MB
-      Helpers::sendJsonResponse(false, 'Kích thước ảnh quá lớn (tối đa 2MB).', null, 400);
+      Helpers::sendJsonResponse(
+        false,
+        'Kích thước ảnh quá lớn (tối đa 2MB).',
+        null,
+        400
+      );
     }
 
     // Cho phép các định dạng nhất định
     if (!in_array($imageFileType, ['jpg', 'png', 'jpeg', 'webp'])) {
-      Helpers::sendJsonResponse(false, 'Chỉ cho phép các định dạng JPG, JPEG, PNG & WEBP.', null, 400);
+      Helpers::sendJsonResponse(
+        false,
+        'Chỉ cho phép các định dạng JPG, JPEG, PNG & WEBP.',
+        null,
+        400
+      );
     }
 
     $userModel = new User();
@@ -199,7 +264,11 @@ class UserController {
         // CẬP NHẬT SESSION
         $_SESSION['user']['avatar_path'] = $dbPath;
 
-        Helpers::sendJsonResponse(true, 'Cập nhật ảnh đại diện thành công.', ['avatar_path' => $dbPath]);
+        Helpers::sendJsonResponse(
+          true,
+          'Cập nhật ảnh đại diện thành công.',
+          ['avatar_path' => $dbPath]
+        );
       } else {
         // Xóa file mới tải lên nếu cập nhật DB thất bại
         unlink($targetPath);
@@ -220,7 +289,12 @@ class UserController {
       ->matches($_POST['new_password'], $_POST['confirm_password'], 'Mật khẩu xác nhận không khớp.');
 
     if ($validator->fails()) {
-      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', $validator->getErrors(), 422);
+      Helpers::sendJsonResponse(
+        false,
+        'Dữ liệu không hợp lệ.',
+        $validator->getErrors(),
+        422
+      );
     }
 
     $userModel = new User();
@@ -234,7 +308,12 @@ class UserController {
     if ($isChanged) {
       Helpers::sendJsonResponse(true, 'Đổi mật khẩu thành công.');
     } else {
-      Helpers::sendJsonResponse(false, 'Đổi mật khẩu thất bại, vui lòng thử lại.', null, 500);
+      Helpers::sendJsonResponse(
+        false,
+        'Đổi mật khẩu thất bại, vui lòng thử lại.',
+        null,
+        500
+      );
     }
   }
 
@@ -306,7 +385,12 @@ class UserController {
       ->required('city', 'Tỉnh/Thành phố không được để trống.');
 
     if ($validator->fails()) {
-      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', $validator->getErrors(), 422);
+      Helpers::sendJsonResponse(
+        false,
+        'Dữ liệu không hợp lệ.',
+        $validator->getErrors(),
+        422
+      );
     }
 
     try {
@@ -342,7 +426,12 @@ class UserController {
       ->required('city', 'Tỉnh/Thành phố không được để trống.');
 
     if ($validator->fails()) {
-      Helpers::sendJsonResponse(false, 'Dữ liệu không hợp lệ.', $validator->getErrors(), 422);
+      Helpers::sendJsonResponse(
+        false,
+        'Dữ liệu không hợp lệ.',
+        $validator->getErrors(),
+        422
+      );
     }
 
     try {
@@ -365,7 +454,12 @@ class UserController {
       }
     } catch (Exception $e) {
       error_log("Update address error: ".$e->getMessage());
-      Helpers::sendJsonResponse(false, 'Cập nhật địa chỉ thất bại do lỗi hệ thống.', null, 500);
+      Helpers::sendJsonResponse(
+        false,
+        'Cập nhật địa chỉ thất bại do lỗi hệ thống.',
+        null,
+        500
+      );
     }
   }
 
@@ -416,7 +510,12 @@ class UserController {
       }
     } catch (Exception $e) {
       error_log("Set default address error: ".$e->getMessage());
-      Helpers::sendJsonResponse(false, 'Đặt địa chỉ mặc định thất bại do lỗi hệ thống.', null, 500);
+      Helpers::sendJsonResponse(
+        false,
+        'Đặt địa chỉ mặc định thất bại do lỗi hệ thống.',
+        null,
+        500
+      );
     }
   }
 }

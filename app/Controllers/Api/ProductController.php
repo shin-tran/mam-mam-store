@@ -6,6 +6,8 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Models\Review;
 use Exception;
+use function in_array;
+use function is_array;
 
 class ProductController {
   public function create() {
@@ -31,13 +33,23 @@ class ProductController {
         throw new Exception('Không thể tạo sản phẩm');
       }
 
-      Helpers::sendJsonResponse(true, 'Sản phẩm đã được tạo thành công.', ['id' => $productId], 201);
+      Helpers::sendJsonResponse(
+        true,
+        'Sản phẩm đã được tạo thành công.',
+        ['id' => $productId],
+        201
+      );
     } catch (Exception $e) {
       if ($imagePath && file_exists(_PROJECT_ROOT.'/public'.$imagePath)) {
         unlink(_PROJECT_ROOT.'/public'.$imagePath);
       }
       error_log("Product creation error: ".$e->getMessage());
-      Helpers::sendJsonResponse(false, 'Tạo sản phẩm thất bại do lỗi hệ thống.', null, 500);
+      Helpers::sendJsonResponse(
+        false,
+        'Tạo sản phẩm thất bại do lỗi hệ thống.',
+        null,
+        500
+      );
     }
   }
 
@@ -69,7 +81,12 @@ class ProductController {
         }
         $imagePath = $newImagePath;
       } else {
-        Helpers::sendJsonResponse(false, 'Tải lên hình ảnh mới thất bại.', null, 500);
+        Helpers::sendJsonResponse(
+          false,
+          'Tải lên hình ảnh mới thất bại.',
+          null,
+          500
+        );
       }
     }
 
@@ -82,7 +99,12 @@ class ProductController {
       }
     } catch (Exception $e) {
       error_log("Product update error: ".$e->getMessage());
-      Helpers::sendJsonResponse(false, 'Cập nhật sản phẩm thất bại do lỗi hệ thống.', null, 500);
+      Helpers::sendJsonResponse(
+        false,
+        'Cập nhật sản phẩm thất bại do lỗi hệ thống.',
+        null,
+        500
+      );
     }
   }
 
@@ -104,7 +126,10 @@ class ProductController {
       $isDeleted = $productModel->deleteProduct($id);
       if ($isDeleted) {
         // Xóa file ảnh
-        if ($product['image_path'] && file_exists(_PROJECT_ROOT.'/public'.$product['image_path'])) {
+        if (
+          $product['image_path'] &&
+          file_exists(_PROJECT_ROOT.'/public'.$product['image_path'])
+        ) {
           unlink(_PROJECT_ROOT.'/public'.$product['image_path']);
         }
         Helpers::sendJsonResponse(true, 'Xóa sản phẩm thành công.');
@@ -113,7 +138,12 @@ class ProductController {
       }
     } catch (Exception $e) {
       error_log("Product delete error: ".$e->getMessage());
-      Helpers::sendJsonResponse(false, 'Xóa sản phẩm thất bại do lỗi hệ thống.', null, 500);
+      Helpers::sendJsonResponse(
+        false,
+        'Xóa sản phẩm thất bại do lỗi hệ thống.',
+        null,
+        500
+      );
     }
   }
 
@@ -137,10 +167,19 @@ class ProductController {
     try {
       $productModel = new Product();
       $products = $productModel->getProductsByIds($sanitizedIds);
-      Helpers::sendJsonResponse(true, 'Lấy thông tin sản phẩm thành công.', $products);
+      Helpers::sendJsonResponse(
+        true,
+        'Lấy thông tin sản phẩm thành công.',
+        $products
+      );
     } catch (Exception $e) {
       error_log("Get cart products error: ".$e->getMessage());
-      Helpers::sendJsonResponse(false, 'Lỗi hệ thống khi lấy thông tin sản phẩm.', null, 500);
+      Helpers::sendJsonResponse(
+        false,
+        'Lỗi hệ thống khi lấy thông tin sản phẩm.',
+        null,
+        500
+      );
     }
   }
 
@@ -155,15 +194,30 @@ class ProductController {
 
     // Validation
     if ($rating < 1 || $rating > 5) {
-      Helpers::sendJsonResponse(false, 'Vui lòng chọn từ 1 đến 5 sao.', null, 422);
+      Helpers::sendJsonResponse(
+        false,
+        'Vui lòng chọn từ 1 đến 5 sao.',
+        null,
+        422
+      );
     }
     if (empty($comment)) {
-      Helpers::sendJsonResponse(false, 'Vui lòng nhập bình luận của bạn.', null, 422);
+      Helpers::sendJsonResponse(
+        false,
+        'Vui lòng nhập bình luận của bạn.',
+        null,
+        422
+      );
     }
 
     $reviewModel = new Review();
     try {
-      $reviewId = $reviewModel->createReview($productId, $userId, $rating, $comment);
+      $reviewId = $reviewModel->createReview(
+        $productId,
+        $userId,
+        $rating,
+        $comment
+      );
       if ($reviewId) {
         Helpers::sendJsonResponse(true, 'Cảm ơn bạn đã gửi đánh giá!', null, 201);
       } else {
@@ -171,7 +225,12 @@ class ProductController {
       }
     } catch (Exception $e) {
       error_log("Review creation error: ".$e->getMessage());
-      Helpers::sendJsonResponse(false, 'Gửi đánh giá thất bại do lỗi hệ thống.', null, 500);
+      Helpers::sendJsonResponse(
+        false,
+        'Gửi đánh giá thất bại do lỗi hệ thống.',
+        null,
+        500
+      );
     }
   }
 
@@ -186,7 +245,11 @@ class ProductController {
     if (empty($post['price']) || !is_numeric($post['price']) || $post['price'] < 0)
       $errors['price'][] = "Giá sản phẩm không hợp lệ.";
 
-    if (!isset($post['stock_quantity']) || !is_numeric($post['stock_quantity']) || $post['stock_quantity'] < 0)
+    if (
+      !isset($post['stock_quantity']) ||
+      !is_numeric($post['stock_quantity']) ||
+      $post['stock_quantity'] < 0
+    )
       $errors['stock_quantity'][] = "Số lượng không hợp lệ.";
 
     if (empty($post['category_id']))
@@ -226,10 +289,10 @@ class ProductController {
     }
 
     $fileName = uniqid().'-'.basename($file['name']);
-    $targetPath = $fullUploadDir.$fileName;
+    $targetPath = "$fullUploadDir$fileName";
 
     if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-      return $uploadDir.$fileName;
+      return "$uploadDir$fileName";
     } else {
       return false;
     }

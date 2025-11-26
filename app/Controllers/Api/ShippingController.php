@@ -3,6 +3,7 @@ namespace App\Controllers\Api;
 
 use App\Helpers\Helpers;
 use App\Models\ShippingConfig;
+use function floatval;
 
 class ShippingController {
   /**
