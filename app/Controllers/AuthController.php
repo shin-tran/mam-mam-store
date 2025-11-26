@@ -41,7 +41,8 @@ class AuthController {
     $user = $userModel->findUserIdByForgotPasswordToken($_GET['token']);
 
     View::render('pages/auth/reset-password', [
-      'title' => 'Đặt lại mật khẩu'
+      'title' => 'Đặt lại mật khẩu',
+      'user' => $user
     ], 'layouts/auth');
   }
 }
