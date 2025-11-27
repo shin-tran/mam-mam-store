@@ -134,7 +134,7 @@ class AuthController {
 
     $refreshToken = bin2hex(random_bytes(32));
     $refreshTokenHash = hash('sha256', $refreshToken);
-    $refreshTokenExpiresAt = new DateTime()->add(new DateInterval($_ENV['REFRESH_TOKEN_LIFETIME']));
+    $refreshTokenExpiresAt = (new DateTime())->add(new DateInterval($_ENV['REFRESH_TOKEN_LIFETIME']));
 
     $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
     $ipAddress = $userModel->getUserIpAddress();
@@ -402,7 +402,7 @@ class AuthController {
       Helpers::sendJsonResponse(false, 'Không tìm thấy người dùng.', null, 404);
     }
 
-    $newRefreshTokenExpiresAt = new DateTime()->add(
+    $newRefreshTokenExpiresAt = (new DateTime())->add(
       new DateInterval($_ENV['REFRESH_TOKEN_LIFETIME'])
     )->format('Y-m-d H:i:s');
     $tokenModel->updateTokenExpiresAt($tokenData['id'], $newRefreshTokenExpiresAt);
